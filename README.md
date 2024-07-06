@@ -25,14 +25,22 @@ Accelatrix is compatible with ES5 and provides a C#-like runtime in the browser,
 You can now deal with classes in the browser at runtime as you would in C#, e.g.:
 
 var myDog = new Bio.Mamal(8);
+
 var myCat = new Bio.Feline(8, 9);
 
 var timeIsSame = (new Date()).Equals(new Date());                //true
+
 var areEqual = myDog.Equals(myCat);                              // false
+
 var myCatType = myCat.GetType();                                 // Bio.Feline
+
 var myCatBaseType = myCat.GetType().BaseType;                    // Bio.Mamal
+
 var isAnimal = myCat.GetType().IsAssignableFrom(Bio.Animal);     // true
+
 var enums = Bio.TypesOfLocomotion.GetType();                     // Accelatrix.EnumType
+
+
 
 // sample classes:
 
