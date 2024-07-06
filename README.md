@@ -26,7 +26,8 @@ You can now deal with classes in the browser at runtime as you would in C#, e.g.
 
 ```
 var myDog = new Bio.Mamal(8);  
-var myCat = new Bio.Feline(8, 9);           
+var myCat = new Bio.Feline(8, 9);
+
 var timeIsSame = (new Date()).Equals(new Date());                //true           
 var areEqual = myDog.Equals(myCat);                              // false           
 var myCatType = myCat.GetType();                                 // Bio.Feline           
