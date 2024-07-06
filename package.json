@@ -1,6 +1,5 @@
 {
-  "name": "accelatrix",
-  "version": "",
+  "name": "@accelatrix/accelatrix",
   "description": "A parallel functional programming framework for in-browser processing of enumerations of business entities",
   "main": "index.js",
   "scripts": {
@@ -33,9 +32,10 @@
     "web Workers"
   ],
   "author": "Miguel@Ferreira-family.org",
-  "license": "https://github.com/accelatrix/accelatrix/blob/main/LICENSE.md",
+  "license": "SEE LICENSE IN https://github.com/accelatrix/accelatrix/blob/main/LICENSE.md",
   "bugs": {
     "url": "https://github.com/accelatrix/accelatrix/issues"
   },
-  "homepage": "https://github.com/accelatrix/accelatrix#readme"
+  "homepage": "https://github.com/accelatrix/accelatrix#readme",
+  "version": "1.0.0"
 }
