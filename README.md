@@ -24,27 +24,30 @@ Accelatrix is compatible with ES5 and provides a C#-like runtime in the browser,
 
 You can now deal with classes in the browser at runtime as you would in C#, e.g.:
 
+```
 var myDog = new Bio.Mamal(8);  
-var myCat = new Bio.Feline(8, 9); 
-var timeIsSame = (new Date()).Equals(new Date());                //true 
-var areEqual = myDog.Equals(myCat);                              // false   
-var myCatType = myCat.GetType();                                 // Bio.Feline 
-var myCatBaseType = myCat.GetType().BaseType;                    // Bio.Mamal 
-var isAnimal = myCat.GetType().IsAssignableFrom(Bio.Animal);     // true  
+var myCat = new Bio.Feline(8, 9);           
+var timeIsSame = (new Date()).Equals(new Date());                //true           
+var areEqual = myDog.Equals(myCat);                              // false           
+var myCatType = myCat.GetType();                                 // Bio.Feline           
+var myCatBaseType = myCat.GetType().BaseType;                    // Bio.Mamal           
+var isAnimal = myCat.GetType().IsAssignableFrom(Bio.Animal);     // true           
 var enums = Bio.TypesOfLocomotion.GetType();                     // Accelatrix.EnumType 
+```
 
 **********************************************
 // sample classes:
 
+```
 export namespace Bio
-{
-    export enum TypesOfLocomotion
-    {
-        Crawl,
-        Swim,
-        Walk,
-        Fly,
-    }
+{           
+    export enum TypesOfLocomotion           
+    {           
+        Crawl,           
+        Swim,           
+        Walk,           
+        Fly,           
+    }           
 
     abstract class LivingBeing
     {
@@ -113,7 +116,7 @@ export namespace Bio
         }
     }
 }
-
+```
 
 *****************************************************************************************************************
 
@@ -124,6 +127,7 @@ export namespace Bio
 You can now use your favourite LINQ operator functions operating on enumerations, not collections, and arrays are
 now enumerations, e.g.:
 
+```
   var myEnumeration = Accelatrix.Enumerable.Range(0, 10000000)                              
                                            .Select(z => i % 2 == 0                              
                                                         ? new Bio.Feline(z % 10, 9)                              
@@ -135,7 +139,8 @@ now enumerations, e.g.:
   var myResult = myEnumeration.Skip(2)                                                            
                               .Take(10)                                                            
                               .ToList()                              
-                              .OrderBy(z => z.NumberOfTits);                              
+                              .OrderBy(z => z.NumberOfTits);
+```                              
 
 
 *****************************************************************************************************************
@@ -147,7 +152,9 @@ now enumerations, e.g.:
 Parallel execution with a .AsParallel() that parallelizes execution across different threads will be made
 available in the near future, e.g.:
 
+```
   var myResult = myEnumeration.AsParallel()                              
                               .Skip(2)                              
                               .Take(10)                              
                               .ToList();
+```                              
