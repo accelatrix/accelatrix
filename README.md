@@ -41,7 +41,7 @@ var isAnimal = myCat.GetType().IsAssignableFrom(Bio.Animal);     // true
 var enums = Bio.TypesOfLocomotion.GetType();                     // Accelatrix.EnumType
 
 
-
+**********************************************
 // sample classes:
 
 export namespace Bio
@@ -132,18 +132,18 @@ export namespace Bio
 You can now use your favourite LINQ operator functions operating on enumerations, not collections, and arrays are
 now enumerations, e.g.:
 
-  var myEnumeration = Accelatrix.Enumerable.Range(0, 10000000)
-                                           .Select(z => i % 2 == 0
-                                                        ? new Bio.Feline(z % 10, 9)
-                                                        : new Bio.Mamal(z % 10))
-                                           .OfType(Bio.Mamal)
-                                           .Where(z => z.NumberOfTits != 1)                                           
-                                           .GroupBy(z => z.NumberOfTits)
+  var myEnumeration = Accelatrix.Enumerable.Range(0, 10000000)                              
+                                           .Select(z => i % 2 == 0                              
+                                                        ? new Bio.Feline(z % 10, 9)                              
+                                                        : new Bio.Mamal(z % 10))                              
+                                           .OfType(Bio.Mamal)                              
+                                           .Where(z => z.NumberOfTits != 1)                                                                         
+                                           .GroupBy(z => z.NumberOfTits)                              
 
-  var myResult = myEnumeration.Skip(2)                              
-                              .Take(10)                              
-                              .ToList()
-                              .OrderBy(z => z.NumberOfTits);
+  var myResult = myEnumeration.Skip(2)                                                            
+                              .Take(10)                                                            
+                              .ToList()                              
+                              .OrderBy(z => z.NumberOfTits);                              
 
 
 *****************************************************************************************************************
@@ -155,7 +155,7 @@ now enumerations, e.g.:
 Parallel execution with a .AsParallel() that parallelizes execution across different threads will be made
 available in the near future, e.g.:
 
-  var myResult = myEnumeration.AsParallel()
+  var myResult = myEnumeration.AsParallel()                              
                               .Skip(2)                              
-                              .Take(10)
+                              .Take(10)                              
                               .ToList();
