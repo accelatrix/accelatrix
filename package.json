@@ -1,5 +1,6 @@
 {
-  "name": "@accelatrix/accelatrix",
+  "name": "accelatrix",
+  "version": "1.0.0",
   "description": "A parallel functional programming framework for in-browser processing of enumerations of business entities",
   "main": "index.js",
   "scripts": {
@@ -36,6 +37,5 @@
   "bugs": {
     "url": "https://github.com/accelatrix/accelatrix/issues"
   },
-  "homepage": "https://github.com/accelatrix/accelatrix#readme",
-  "version": "1.0.0"
+  "homepage": "https://github.com/accelatrix/accelatrix#readme"
 }
