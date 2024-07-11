@@ -26,13 +26,14 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    export const Version = "1.0.0";
+    const Version = "1.0.1";
+    /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
         get Message(): string;
     }
     /** An exception to be raised when a null argument passed onto a function is deemed as unexpected. */
-    export class ArgumentNullException extends Exception {
+    class ArgumentNullException extends Exception {
         /**
          * Creates a new ArgumentNullException.
          * @param argumentName The name of the argument.
@@ -46,7 +47,7 @@ export declare namespace Accelatrix {
         constructor(message: string, argumentName: string);
     }
     /** An exception to be raised when an argument passed onto a function is deemed as unexpected. */
-    export class ArgumentException extends Exception {
+    class ArgumentException extends Exception {
         /**
          * Creates a new ArgumentNullException.
          * @param argumentName The name of the argument.
@@ -65,10 +66,10 @@ export declare namespace Accelatrix {
      * @param constructor The class constructor.
      * @returns Returns the modified class constructor.
      */
-    export function ImmutableObject<T extends {
+    function ImmutableObject<T extends {
         new (...args: any[]): {};
     }>(constructor: T): T;
-    export namespace ImmutableObject {
+    namespace ImmutableObject {
         /**
          * Indicates if a given object is frozen.
          * @param obj The object to probe.
@@ -82,7 +83,6 @@ export declare namespace Accelatrix {
          */
         const Freeze: (obj: object, propagate?: boolean) => void;
     }
-    export {};
 }
 
 
@@ -164,7 +164,7 @@ declare global {
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
     /** The generic representation of a type.*/
-    abstract class Type {
+    export abstract class Type {
         /**
          * Creates a new Type instance.
          * @param constructor The constructor function that builds an instance of the Type.
@@ -263,12 +263,97 @@ export declare namespace Accelatrix {
          */
         static FromInstance(obj: any): Type;
         /**
+         * Gets the Type of the supplied object's constructor.
+         * @param constructor The constructor.
+         * @returns Returns the corresponding Type.
+         */
+        static FromConstructor(constructor: {
+            new (...args: any[]): any;
+        }): Type;
+        /**
          * Gets all Types that match a specified name ordered by best match.
          * @param typeName The name of the type to retrieve.
          * @returns Returns all Types that match a specified name ordered by best match.
          */
         static FromName(typeName: string): Array<Type>;
     }
+    /** An exception pertaining to types. */
+    export abstract class TypeException extends Accelatrix.Exception {
+        /**
+         * Creates a new TypeException.
+         * @param typeName The name of the type.
+         */
+        constructor(typeName: string);
+        /**
+         * Creates a new TypeException.
+         * @param typeName The name of the type.
+         * @param message A custom message.
+         */
+        constructor(typeName: string, message: string);
+        /** Gets the name of the type. */
+        get TypeName(): string;
+    }
+    /** An exception describing when a given type could not be found. */
+    export class TypeNotFoundException extends TypeException {
+        /**
+         * Creates a new TypeNotFoundException.
+         * @param typeName The name of the type.
+         */
+        constructor(typeName: string);
+        /**
+         * Creates a new TypeNotFoundException.
+         * @param typeName The name of the type.
+         * @param message A custom message.
+         */
+        constructor(typeName: string, message: string);
+    }
+    /** An exception describing when a given type is not unique. */
+    export class AmbiguousTypeException extends TypeException {
+        /**
+         * Creates a new AmbiguousTypeException.
+         * @param typeName The name of the type.
+         */
+        constructor(typeName: string);
+        /**
+         * Creates a new AmbiguousTypeException.
+         * @param typeName The name of the type.
+         * @param message A custom message.
+         */
+        constructor(typeName: string, message: string);
+        /**
+         * Creates a new AmbiguousTypeException.
+         * @param typeName The name of the type.
+         * @param message A custom message.
+         * @param otherTypes The other types that match the same criteria.
+         */
+        constructor(typeName: string, message: string, otherTypes: Array<Type>);
+    }
+    /** An exception describing when a given type is not of the expected subtype. */
+    export class SubTypeMismatchException extends TypeException {
+        /**
+         * Creates a new SubTypeMismatchException.
+         * @param superType The super type.
+         * @param subType The subType.
+         */
+        constructor(superType: Type, subType: Type);
+        /** Gets the name of the subtype. */
+        get SubTypeName(): string;
+    }
+    namespace Accelatrix {
+        abstract class Exception extends Error {
+            constructor(message: string);
+        }
+        class ArgumentNullException {
+            constructor(message: string, argumentName?: string);
+        }
+        class ArgumentException {
+            constructor(message: string, argumentName?: string);
+        }
+        function ImmutableObject<T extends {
+            new (...args: any[]): {};
+        }>(constructor: T): T;
+    }
+    export {};
 }
 
 
@@ -997,11 +1082,11 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    /** Supports a simple iteraction over an enumeration of a specified type. */
+    /** Supports a simple iteration over an enumeration of a specified type. */
     export interface IEnumerator<T> {
         /** Gets the element in the enumeration at the current position. */
-        Current: T;
-        /** Advances the enumerator to the next element of the enumeration and indicates if the operation was successfull. */
+        readonly Current: T;
+        /** Advances the enumerator to the next element of the enumeration and indicates if the operation was successful. */
         MoveNext: () => boolean;
         /** Sets the enumerator to its initial position, which is before the first element. */
         Reset: () => void;
@@ -1021,7 +1106,7 @@ export declare namespace Accelatrix {
     interface IEnumerableOps<T> {
         /**
          * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
-         * @param typeConstructor The type constructor, e.g. the reference to the class.
+         * @param typeConstructor The type constructor, e.g. the reference to the class definition.
          */
         OfType<TFilter extends T>(typeConstructor: {
             new (...args: any[]): TFilter;
@@ -1065,21 +1150,15 @@ export declare namespace Accelatrix {
         * @param selector The selector function.
         */
         Where(selector: (element: T, index?: number) => boolean): IEnumerable<T>;
-        /**
-        * Finds all elements in a collection.
-        * @param what The element to find.
-        * @param equalityComparer An optional equatability comparer. If none is specified, the default is used as in the Where implementation.
-        */
-        Find(what: T, equalityComparer?: (first: T, second: T) => boolean): IEnumerable<T>;
         /** Gets the first element of a sequence, or null if empty. */
         FirstOrNull(): T;
         /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
         LastOrNull(): T;
         /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
         Reverse(): Array<T>;
-        /** Gets all entries which are not null, and in string enumerations, not empty. */
+        /** Gets all entries which are not null, and in string enumerations, not empty or white spaces. */
         NotNullOrEmpty(): IEnumerable<T>;
-        /** If a given element exists within the collection. */
+        /** If a given element exists within the enumeration. */
         Contains(element: T): boolean;
         /**
         * Sorts the sequence is ascending order.
@@ -1122,11 +1201,6 @@ export declare namespace Accelatrix {
         */
         Except(sequence: IEnumerable<T>): IEnumerable<T>;
         /**
-        * Removes an element or set of elements based on a selector from the collection.
-        * @param selector The element to remove, or a Where condition matching the elements to be removed.
-        */
-        Remove(selector: (element: T, index?: number) => boolean | T): IEnumerable<T>;
-        /**
         * Produces the set union of two sequences by using the default equality comparer.
         * Different from Concat since only distinct members of the second sequence will end up in the new enumeration.
         * @param sequence The sequence to union.
@@ -1143,7 +1217,7 @@ export declare namespace Accelatrix {
         */
         Take(count: number): IEnumerable<T>;
         /**
-        * Skips the collection while a condition is tru.
+        * Skips the sequence while a condition is true.
         * @param condition The condition that while true will skip the member.
         */
         SkipWhile(condition: (member: T) => boolean): IEnumerable<T>;
@@ -1235,20 +1309,10 @@ export declare namespace Accelatrix {
     /** An enumeration. */
     export class Enumerable<T> implements IEnumerable<T> {
         /**
-        * Creates a new Enumeration based on an generator.
-        * @param iterator The generator.
+       * Creates a new Enumeration based on an existing enumeration.
+        * @param enumerable An array, an enumeration, or a factory
         */
-        constructor(generator: () => IterableIterator<T>);
-        /**
-        * Creates a new Enumeration based on an existing Array.
-        * @param array The array to enumerate.
-        */
-        constructor(array: Array<T>);
-        /**
-        * Creates a new Enumeration based on an existing IEnumerable.
-        * @param enumeration The enumerations.
-        */
-        constructor(enumeration: IEnumerable<T>);
+        constructor(enumerable: Array<T> | IEnumerable<T> | (() => IterableIterator<T>));
         /** Gets the enumerator to iterate through the enumeration. */
         GetEnumerator(): IEnumerator<T>;
         /**  Gets if the sequence contains any elements. */
@@ -1299,12 +1363,6 @@ export declare namespace Accelatrix {
          * @param selector The filter predicate.
          */
         Where(selector: (element: T, index?: number) => boolean): IEnumerable<T>;
-        /**
-        * Finds all elements in a collection.
-        * @param what The element to find.
-        * @param equalityComparer An optional equatability comparer. If none is specified, the default is used as in the Where implementation.
-        */
-        Find(what: T, equalityComparer?: (first: T, second: T) => boolean): IEnumerable<T>;
         /** Gets the first element of a sequence, or null if empty. */
         FirstOrNull(): T;
         /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
@@ -1353,11 +1411,6 @@ export declare namespace Accelatrix {
         * @param sequence The sequence to subtract.
         */
         Except(sequence: IEnumerable<T>): IEnumerable<T>;
-        /**
-        * Removes an element or set of elements based on a selector from the collection.
-        * @param selector The element to remove, or a Where condition matching the elements to be removed.
-        */
-        Remove(selector: (element: T, index?: number) => boolean | T): IEnumerable<T>;
         /**
         * Produces the set union of two sequences by using the default equality comparer.
         * Different from Concat since only distinct members of the second sequence will end up in the new enumeration.
@@ -1438,3 +1491,6 @@ export declare namespace Accelatrix {
     }
     export {};
 }
+
+
+export {};
