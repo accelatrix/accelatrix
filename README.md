@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.1.0
+                                         Accelatrix v1.1.1
 
     A parallel functional programming framework for in-browser processing of enumerations of business entities        
 
@@ -164,7 +164,7 @@ allowing for TypeScript properties to be stringified, but not the underlying mem
 The deserialization also respects types and deserializes to classes instead of plain objects.
 
 
----
+```
 var x = Accelatrix.Serialization.ToJSON(SerializationTests.GetClassInstance())
 
 // '{"$type":"SerializableClass","NameProp":"Test Sat Jul 13 2024 09:12:03 GMT+0200 (Central European Summer Time)","Time":"2024-07-13T09:12:03.527"}'
@@ -173,12 +173,11 @@ var x = Accelatrix.Serialization.ToJSON(SerializationTests.GetClassInstance())
 var y = Accelatrix.Serialization.FromJSON(x)
 console.log(y.GetType())  // SerializableClass
 
-
----
+```
 
 Try it yourself with these classes:
 
----
+```
 export module SerializationTests
 {
     export function GetClassInstance()
@@ -252,8 +251,7 @@ export module SerializationTests
         }            
     }
 }
-
----
+```
 
 
 *****************************************************************************************************************
