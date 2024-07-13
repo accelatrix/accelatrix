@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.0.1";
+    const Version = "1.1.0";
     /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
@@ -270,6 +270,15 @@ export declare namespace Accelatrix {
         static FromConstructor(constructor: {
             new (...args: any[]): any;
         }): Type;
+        /**
+         * Gets the Type of the supplied object's constructor.
+         * @param constructor The constructor.
+         * @param alias The alias of the type, which should include namespace information, e.g. Bio.Mamal.Dog.
+         * @returns Returns the corresponding Type.
+         */
+        static FromConstructor(constructor: {
+            new (...args: any[]): any;
+        }, alias: string): Type;
         /**
          * Gets all Types that match a specified name ordered by best match.
          * @param typeName The name of the type to retrieve.
@@ -1493,4 +1502,74 @@ export declare namespace Accelatrix {
 }
 
 
-export {};
+import { Accelatrix as Accelatrix_Type } from "./Type";
+export declare namespace Accelatrix {
+    /** Deals with JSON serialization. */
+    namespace Serialization {
+        /**
+         * Parses a JSON string into a typed class where the expected type in contained in a $type property.
+         * @param json The JSON string to deserialize.
+         * @returns Returns the deserialized class according to the specified type.
+         */
+        function FromJSON<T>(json: string): T;
+        /**
+         * Parses a JSON string into a typed class.
+         * @param json The JSON string to deserialize.
+         * @param type The type constructor, e.g. the reference to the class definition.
+         * @returns Returns the deserialized class according to the specified type.
+         */
+        function FromJSON<T>(json: string, type: {
+            new (...args: any[]): T;
+        }): T;
+        /**
+         * Parses a JSON string into a typed class.
+         * @param json The JSON string to deserialize.
+         * @param type The Accelatrix.Type of the type to filter.
+         * @returns Returns the deserialized class according to the specified type.
+         */
+        function FromJSON<T>(json: string, type: Accelatrix_Type.Type): T;
+        /**
+         * Parses a JSON string into a typed class.
+         * @param json The JSON string to deserialize.
+         * @param typeName The name or full name of the type or its alias ($type).
+         * @returns Returns the deserialized class according to the specified type.
+         */
+        function FromJSON<T>(json: string, typeName: string): T;
+        /**
+         * Serializes an object as JSON and includes $type annotations.
+         * @param obj The object to serialize.
+         */
+        function ToJSON(obj: any): string;
+        /**
+         * Decorator to mark a class in order to register its type during a deserialization process.
+         * @param constructor The class constructor.
+         */
+        function KnownType<T extends {
+            new (...args: any[]): {};
+        }>(constructor: T): any;
+        /**
+         * Decorator to mark a class in order to register its type during a deserialization process.
+         * @param alias The alias of the type, which should include namespace information, e.g. Bio.Mamal.Dog.
+         */
+        function KnownType<T extends {
+            new (...args: any[]): {};
+        }>(alias: string): any;
+        /**
+         * A decorator to mark a property as serializable.
+         */
+        function DataMember(): any;
+        /**
+         * A decorator to mark a property as serializable.
+         * @param include If it should be included.
+         */
+        function DataMember(include: boolean): any;
+        /** Decorator to tag the method to be invoked when serialization begins. */
+        function OnSerializing(): (target: Object, propertyKey: string, descriptor: PropertyDescriptor) => void;
+        /** Decorator to tag the method to be invoked when serialization ends. */
+        function OnSerialized(): (target: Object, propertyKey: string, descriptor: PropertyDescriptor) => void;
+        /** Decorator to tag the method to be invoked when deserialization begins. */
+        function OnDeserializing(): (target: Object, propertyKey: string, descriptor: PropertyDescriptor) => void;
+        /** Decorator to tag the method to be invoked when deserialization ends. */
+        function OnDeserialized(): (target: Object, propertyKey: string, descriptor: PropertyDescriptor) => void;
+    }
+}
