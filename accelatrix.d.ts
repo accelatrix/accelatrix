@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.1.1";
+    const Version = "1.1.2";
     /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
@@ -59,6 +59,22 @@ export declare namespace Accelatrix {
          * @param argumentName The name of the argument.
          */
         constructor(message: string, argumentName: string);
+    }
+    /** An exception to be raised when aborting an ongoing request. */
+    class AbortException extends Exception {
+        /** Creates a new AbortException instance with a default message. */
+        constructor();
+        /**
+         * Creates a new AbortException instance.
+         * @param message The message.
+         */
+        constructor(message: string);
+        /**
+         * Indicates if a given exception represents an abandonement of an ongoing request.
+         * @param exception The exception to probe.
+         * @returns Returns if the supplied exception represents an abandonement of an ongoing request.
+         */
+        static IsAbort(exception: Exception): boolean;
     }
     /**
      * Decorator to mark and make classes immutable.
@@ -1572,4 +1588,128 @@ export declare namespace Accelatrix {
         /** Decorator to tag the method to be invoked when deserialization ends. */
         function OnDeserialized(): (target: Object, propertyKey: string, descriptor: PropertyDescriptor) => void;
     }
+}
+
+
+export declare namespace Accelatrix {
+    /** An ongoing promise-like request that can be cancelled, along with the error and result callback. */
+    export interface ICancellablePromise<T> extends PromiseLike<T> {
+        /** Cancels an ongoing request by raising an AbortException. */
+        Cancel(): void;
+        /** Attaches a callback to the rejection of the promise. */
+        Catch(onrejected: (exception: Accelatrix.Exception) => void): ICancellablePromise<T>;
+        /** Attaches callbacks for the resolution and/or rejection of the Promise. */
+        Then(onfulfilled: (value: T) => void): ICancellablePromise<T>;
+        /** An optional callback to invoke once the request is complete. */
+        Finally(callback: () => void): ICancellablePromise<T>;
+    }
+    /** Chains multiple concurrent activities. */
+    export class AsyncChainer<T, TException extends Accelatrix.Exception> implements ICancellablePromise<T> {
+        private workStarted;
+        private hasCalledBack;
+        private hasResolved;
+        private hasDeferred;
+        private workload;
+        private callback;
+        private failed;
+        private doneCount;
+        private lastNonNullResult;
+        private accumulatedResult;
+        private finally;
+        private constructor();
+        /**
+         * Queues a work activity for parallel async processing.
+         * @param work The work load to carry out.
+         */
+        static Run<T, TException extends Accelatrix.Exception>(work: () => ICancellablePromise<T>): AsyncChainer<T, Accelatrix.Exception>;
+        /**
+         * Queues a work activity for parallel async processing.
+         * @param work The work load set to carry out.
+         */
+        static Run<T, TException extends Accelatrix.Exception>(work: Array<() => ICancellablePromise<T>>): AsyncChainer<T, Accelatrix.Exception>;
+        /**
+         * Queues a work activity for parallel async processing.
+         * @param work The work load to carry out.
+         */
+        static Run<T, TException extends Accelatrix.Exception>(work: () => T | AsyncChainer<T, TException> | Promise<T> | ICancellablePromise<T> | void): AsyncChainer<T, TException>;
+        /**
+         * Queues a work activity for parallel async processing and yields a map with all the collected results.
+         * @param name The name of the activity.
+         * @param work The work load set to carry out.
+         */
+        static RunToMap<T, TException extends Accelatrix.Exception>(work: {
+            [key: string]: () => T | AsyncChainer<T, TException> | Promise<T> | ICancellablePromise<T> | void;
+        }): AsyncChainer<{
+            [key: string]: T;
+        }, TException>;
+        /**
+         * Returns an empty promise.
+         * @param selfResolving If the promise should automatically self-resolve.
+         */
+        static Empty<T, TException extends Accelatrix.Exception>(selfResolving?: boolean): AsyncChainer<T, TException>;
+        /**
+         * Returns an empty paused promise that will never resolve unless .Resolve() or .Defer() are called.
+         */
+        static Frozen<T, TException extends Accelatrix.Exception>(): AsyncChainer<T, TException>;
+        /**
+         * Queues a work activity for parallel async processing.
+         * @param work The work load to carry out.
+         */
+        Run(work: () => T | AsyncChainer<T, TException> | Promise<T> | ICancellablePromise<T> | void): AsyncChainer<T, TException>;
+        /**
+         * What to call once the workload is completely finished. This will trigger processing.
+         * @param callback The callback to invoke once the workload is completely finished.
+         */
+        Then(callback: (result: T) => void): AsyncChainer<T, TException>;
+        then: any;
+        catch: (callback: (exception: TException) => void) => AsyncChainer<T, TException>;
+        /**
+         * What to call id any work activity has failed.
+         * @param callback The callback to invoke if at least one activity has failed.
+         */
+        Catch(callback: (exception: TException) => void): AsyncChainer<T, TException>;
+        /** Cancels an ongoing execution. */
+        Cancel(): void;
+        /**
+         * Chains the execution of an additional workload whose input is the output of the current.
+         * @param onResult The function that receives the current result and produces a new workload of type ICancelablePromise.
+         */
+        ContinueWith<T, TOut>(onResult: (result: T) => ICancellablePromise<TOut>): AsyncChainer<TOut, TException>;
+        /**
+         * Chains the execution of an additional workload whose input is the output of the current.
+         * @param onResult The function that receives the current result and produces a new workload which is a collection of ICancelablePromise.
+         */
+        ContinueWith<T, TOut>(onResult: (result: T) => Array<ICancellablePromise<TOut>>): AsyncChainer<TOut, TException>;
+        /**
+         * Chains the execution of an additional workload whose input is the output of the current.
+         * @param onResult The function that receives the current result and produces a new workload.
+         */
+        ContinueWith<T, TOut>(onResult: (result: T) => TOut | AsyncChainer<TOut, TException> | Promise<TOut> | ICancellablePromise<TOut> | void): AsyncChainer<TOut, TException>;
+        /**
+         * Pushes a result into the worload resolution resultset.
+         * @param result The result to push into the pipeline.
+         */
+        Resolve(result: T): void;
+        /**
+         * Fails the workload with an exception.
+         * @param exception The exception to fail workload.
+         */
+        Defer(exception: Accelatrix.Exception): void;
+        /**
+         * Sets an optional callback to invoke at the end of the procedure.
+         * @param finallyCallback The callback to invoke at the end.
+         */
+        Finally(finallyCallback: () => void): AsyncChainer<T, TException>;
+        private Work;
+        private UnpackCanceller;
+        private AbortWorkload;
+    }
+    namespace Accelatrix {
+        class Exception extends Error {
+            get Message(): string;
+        }
+        class AbortException extends Exception {
+        }
+    }
+    export {};
 }
