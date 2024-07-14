@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.1.2";
+    const Version = "1.1.3";
     /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
@@ -180,7 +180,7 @@ declare global {
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
     /** The generic representation of a type.*/
-    export abstract class Type {
+    abstract class Type {
         /**
          * Creates a new Type instance.
          * @param constructor The constructor function that builds an instance of the Type.
@@ -301,84 +301,77 @@ export declare namespace Accelatrix {
          * @returns Returns all Types that match a specified name ordered by best match.
          */
         static FromName(typeName: string): Array<Type>;
+        /** An exception pertaining to types. */
+        static TypeException: {
+            new (typeName: string): {
+                /** Gets the name of the type. */
+                readonly TypeName: string;
+                name: string;
+                message: string;
+                stack?: string;
+            };
+            new (typeName: string, message: string): {
+                /** Gets the name of the type. */
+                readonly TypeName: string;
+                name: string;
+                message: string;
+                stack?: string;
+            };
+        };
+        /** An exception describing when a given type could not be found. */
+        static TypeNotFoundException: {
+            new (typeName: string): {
+                /** Gets the name of the type. */
+                readonly TypeName: string;
+                name: string;
+                message: string;
+                stack?: string;
+            };
+            new (typeName: string, message: string): {
+                /** Gets the name of the type. */
+                readonly TypeName: string;
+                name: string;
+                message: string;
+                stack?: string;
+            };
+        };
+        /** An exception describing when a given type is not unique. */
+        static AmbiguousTypeException: {
+            new (typeName: string): {
+                /** Gets the name of the type. */
+                readonly TypeName: string;
+                name: string;
+                message: string;
+                stack?: string;
+            };
+            new (typeName: string, message: string): {
+                /** Gets the name of the type. */
+                readonly TypeName: string;
+                name: string;
+                message: string;
+                stack?: string;
+            };
+            new (typeName: string, message: string, otherTypes: Array<Type>): {
+                /** Gets the name of the type. */
+                readonly TypeName: string;
+                name: string;
+                message: string;
+                stack?: string;
+            };
+        };
+        /** An exception describing when a given type is not of the expected subtype. */
+        static SubTypeMismatchException: {
+            new (superType: Type, subType: Type): {
+                /** Gets the name of the subtype. */
+                readonly SubTypeName: string;
+                /** Gets the name of the type. */
+                readonly TypeName: string;
+                name: string;
+                message: string;
+                stack?: string;
+            };
+        };
     }
-    /** An exception pertaining to types. */
-    export abstract class TypeException extends Accelatrix.Exception {
-        /**
-         * Creates a new TypeException.
-         * @param typeName The name of the type.
-         */
-        constructor(typeName: string);
-        /**
-         * Creates a new TypeException.
-         * @param typeName The name of the type.
-         * @param message A custom message.
-         */
-        constructor(typeName: string, message: string);
-        /** Gets the name of the type. */
-        get TypeName(): string;
-    }
-    /** An exception describing when a given type could not be found. */
-    export class TypeNotFoundException extends TypeException {
-        /**
-         * Creates a new TypeNotFoundException.
-         * @param typeName The name of the type.
-         */
-        constructor(typeName: string);
-        /**
-         * Creates a new TypeNotFoundException.
-         * @param typeName The name of the type.
-         * @param message A custom message.
-         */
-        constructor(typeName: string, message: string);
-    }
-    /** An exception describing when a given type is not unique. */
-    export class AmbiguousTypeException extends TypeException {
-        /**
-         * Creates a new AmbiguousTypeException.
-         * @param typeName The name of the type.
-         */
-        constructor(typeName: string);
-        /**
-         * Creates a new AmbiguousTypeException.
-         * @param typeName The name of the type.
-         * @param message A custom message.
-         */
-        constructor(typeName: string, message: string);
-        /**
-         * Creates a new AmbiguousTypeException.
-         * @param typeName The name of the type.
-         * @param message A custom message.
-         * @param otherTypes The other types that match the same criteria.
-         */
-        constructor(typeName: string, message: string, otherTypes: Array<Type>);
-    }
-    /** An exception describing when a given type is not of the expected subtype. */
-    export class SubTypeMismatchException extends TypeException {
-        /**
-         * Creates a new SubTypeMismatchException.
-         * @param superType The super type.
-         * @param subType The subType.
-         */
-        constructor(superType: Type, subType: Type);
-        /** Gets the name of the subtype. */
-        get SubTypeName(): string;
-    }
-    namespace Accelatrix {
-        abstract class Exception extends Error {
-            constructor(message: string);
-        }
-        class ArgumentNullException {
-            constructor(message: string, argumentName?: string);
-        }
-        class ArgumentException {
-            constructor(message: string, argumentName?: string);
-        }
-        function ImmutableObject<T extends {
-            new (...args: any[]): {};
-        }>(constructor: T): T;
-    }
-    export {};
 }
 
 
@@ -867,7 +860,7 @@ export declare namespace Accelatrix {
 
 
 
-import { Accelatrix } from './Globalization';
+
 declare global {
     export interface Date {
         /** Produces a culture-aware long date string according to the default ILocaleFormatInfo in Accelatrix.Globalization.DefaultFormatting.*/
@@ -1091,7 +1084,7 @@ export {};
 
 
 
-import { Accelatrix as Accelatrix_Type } from "./Type";
+
 declare global {
     /** Array as IEnumerable. */
     export interface Array<T> extends Accelatrix.IEnumerable<T> {
@@ -1140,7 +1133,7 @@ export declare namespace Accelatrix {
          * Filters members based on their type.  Type inheritance is taken into account.
          * @param type The Accelatrix.Type of the type to filter.
          */
-        OfType<TFilter extends T>(type: Accelatrix_Type.Type): IEnumerable<TFilter>;
+        OfType<TFilter extends T>(type: Accelatrix.Type): IEnumerable<TFilter>;
         /**
          * Filters members based on their type.  Type inheritance is taken into account.
          * @param typeName The name or full name of the type.
@@ -1364,7 +1357,7 @@ export declare namespace Accelatrix {
          */
         OfType<TFilter extends T>(typeConstructorOrType: {
             new (...args: any[]): TFilter;
-        } | Accelatrix_Type.Type | string): IEnumerable<TFilter>;
+        } | Accelatrix.Type | string): IEnumerable<TFilter>;
         /**
         * Projects each element of a sequence into a new form.
         *
@@ -1518,7 +1511,7 @@ export declare namespace Accelatrix {
 }
 
 
-import { Accelatrix as Accelatrix_Type } from "./Type";
+
 export declare namespace Accelatrix {
     /** Deals with JSON serialization. */
     namespace Serialization {
@@ -1543,7 +1536,7 @@ export declare namespace Accelatrix {
          * @param type The Accelatrix.Type of the type to filter.
          * @returns Returns the deserialized class according to the specified type.
          */
-        function FromJSON<T>(json: string, type: Accelatrix_Type.Type): T;
+        function FromJSON<T>(json: string, type: Accelatrix.Type): T;
         /**
          * Parses a JSON string into a typed class.
          * @param json The JSON string to deserialize.
