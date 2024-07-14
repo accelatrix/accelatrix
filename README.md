@@ -1,5 +1,7 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.1.1
+                                         Accelatrix v1.1.3
+
+                                   (TypeScript and ES5-compliant)
 
     A parallel functional programming framework for in-browser processing of enumerations of business entities        
 
@@ -126,20 +128,20 @@ export namespace Bio
 *****************************************************************************************************************
 
 You can now use your favourite LINQ operator functions operating on enumerations, not collections, and arrays are
-now enumerations, e.g.:
+now enumerations as well, e.g.:
 
 ```
-  var myEnumeration = Accelatrix.Enumerable.Range(0, 10000000)                              
-                                           .Select(z => i % 2 == 0                              
-                                                        ? new Bio.Feline(z % 10, 9)                              
-                                                        : new Bio.Mamal(z % 10))                              
-                                           .OfType(Bio.Mamal)                              
-                                           .Where(z => z.NumberOfTits != 1)                                                                         
-                                           .GroupBy(z => z.NumberOfTits)                              
+  var myEnumeration = Accelatrix.Enumerable.Range(0, 10000000)
+                                           .Select(z => i % 2 == 0
+                                                        ? new Bio.Feline(z % 10, 9)
+                                                        : new Bio.Mamal(z % 10))
+                                           .OfType(Bio.Mamal)
+                                           .Where(z => z.NumberOfTits != 1)
+                                           .GroupBy(z => z.NumberOfTits)
 
-  var myResult = myEnumeration.Skip(2)                                                            
-                              .Take(10)                                                            
-                              .ToList()                              
+  var myResult = myEnumeration.Skip(2)
+                              .Take(10)
+                              .ToList()
                               .OrderBy(z => z.NumberOfTits);
 ```                              
 
@@ -251,6 +253,7 @@ export module SerializationTests
         }            
     }
 }
+
 ```
 
 
@@ -264,8 +267,8 @@ Parallel execution with a .AsParallel() that parallelizes execution across diffe
 available in the near future, e.g.:
 
 ```
-  var myResult = myEnumeration.AsParallel()                              
-                              .Skip(2)                              
-                              .Take(10)                              
+  var myResult = myEnumeration.AsParallel()
+                              .Skip(2)
+                              .Take(10)
                               .ToList();
 ```                              
