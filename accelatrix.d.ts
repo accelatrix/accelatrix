@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.1.3";
+    const Version = "1.1.4";
     /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
@@ -610,6 +610,7 @@ export declare namespace Accelatrix {
 
 
 
+
 declare global {
     /** Number definition. */
     export interface Number {
@@ -691,7 +692,7 @@ declare global {
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
     /** Represents a unit of an IQuantity. */
-    export interface IUnit {
+    interface IUnit {
         /** The code of the unit, e.g. EUR. */
         Code: string;
         /** The given name of the unit, e.g. European Union Euro. */
@@ -700,7 +701,7 @@ export declare namespace Accelatrix {
         ShortName?: string;
     }
     /** A generic quantity with a unit. */
-    export interface IQuantity<T extends IUnit> {
+    interface IQuantity<T extends IUnit> {
         /** The full precision numeric amount.*/
         Amount: number;
         /**
@@ -719,7 +720,7 @@ export declare namespace Accelatrix {
         Add?: (operands: number | IQuantity<T> | Array<number | IQuantity<T>>) => IQuantity<T>;
     }
     /** A base implementation of IQuantity<T>. Consider decorating descendant tyoes with the Accelatrix.ImmutableObject decorator. */
-    export abstract class Quantity<T extends IUnit> implements IQuantity<IUnit> {
+    abstract class Quantity<T extends IUnit> implements IQuantity<IUnit> {
         /**
          * Createa a new Quantity intance.
          * @param amount The amount in full precision.
@@ -805,57 +806,6 @@ export declare namespace Accelatrix {
          */
         static Unitless<TUnit extends IUnit>(amount: number, precision: number): any;
     }
-    namespace Accelatrix {
-        class ArgumentNullException {
-            constructor(message: string, argumentName?: string);
-        }
-        class ArgumentException {
-            constructor(message: string, argumentName?: string);
-        }
-        function ImmutableObject<T extends {
-            new (...args: any[]): {};
-        }>(constructor: T): T;
-        namespace ImmutableObject {
-            /**
-             * Makes an object immutable by freezing it and persisting its GetHashCode().
-             * @param obj The object to freeze.
-             * @param propagate If the children should be frozen as well.
-             */
-            const Freeze: (obj: object, propagate?: boolean) => void;
-        }
-        /** Deals with localization. */
-        module Globalization {
-            /** Represent the formatting parameters for a given locale- */
-            interface ILocaleFormatInfo {
-                /** Gets the short date pattern, e.g. dd/mm/yyyy */
-                readonly ShortDatePattern: string;
-                /** Gets the short time pattern, e.g. hh:mm */
-                readonly ShortTimePattern: string;
-                /** Gets the decimal separator for numbers. */
-                readonly NumberDecimalSeparator: string;
-                /** Gets the thousands separator for numbers. */
-                readonly NumberGroupSeparator: string;
-                /** Gets the abbreviated form of the name of the months. */
-                readonly AbbreviatedMonthNames: string[];
-                /** Gets the abbreviated form for thousands, e.g. K. */
-                readonly ThousandsSign: string;
-                /** Gets the abbreviated form for thousands, e.g. M. */
-                readonly MillionsSign: string;
-                /** Gets the abbreviated form for thousands, e.g. B. */
-                readonly BillionsSign: string;
-            }
-            /**
-             * Formats a number as string according to the specific ILocaleFormatInfo.
-             * @param number The number to format.
-             * @param precision The precision, null or 0 for full precision, 1 for integer, 10 for 1 decinal, 100 for 2 decimals, etc.
-             * @param numberFormatSimplification If the number should be simplified, e.g. 1.1K, 2.2M.
-             * @param formats A different set of formats to be used instead of Globalization.DefaultFormatting.
-             * @returns Returns the specified number as a formatted string.
-             */
-            function FormatNumber(number: number, precision?: number, numberFormatSimplification?: any, formats?: ILocaleFormatInfo): string;
-        }
-    }
-    export {};
 }
 
 
@@ -1584,9 +1534,10 @@ export declare namespace Accelatrix {
 }
 
 
+
 export declare namespace Accelatrix {
     /** An ongoing promise-like request that can be cancelled, along with the error and result callback. */
-    export interface ICancellablePromise<T> extends PromiseLike<T> {
+    interface ICancellablePromise<T> extends PromiseLike<T> {
         /** Cancels an ongoing request by raising an AbortException. */
         Cancel(): void;
         /** Attaches a callback to the rejection of the promise. */
@@ -1597,7 +1548,7 @@ export declare namespace Accelatrix {
         Finally(callback: () => void): ICancellablePromise<T>;
     }
     /** Chains multiple concurrent activities. */
-    export class AsyncChainer<T, TException extends Accelatrix.Exception> implements ICancellablePromise<T> {
+    class AsyncChainer<T, TException extends Accelatrix.Exception> implements ICancellablePromise<T> {
         private workStarted;
         private hasCalledBack;
         private hasResolved;
@@ -1697,12 +1648,4 @@ export declare namespace Accelatrix {
         private UnpackCanceller;
         private AbortWorkload;
     }
-    namespace Accelatrix {
-        class Exception extends Error {
-            get Message(): string;
-        }
-        class AbortException extends Exception {
-        }
-    }
-    export {};
 }
