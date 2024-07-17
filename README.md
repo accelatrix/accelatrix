@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.1.5  
+                                         Accelatrix v1.1.6
 
                                    (TypeScript and ES5-compliant)
 
@@ -174,6 +174,24 @@ var x = Accelatrix.Serialization.ToJSON(SerializationTests.GetClassInstance())
 
 var y = Accelatrix.Serialization.FromJSON(x)
 console.log(y.GetType())  // SerializableClass
+
+```
+
+Even Enumerations with their functions can be serialised and deserialised:
+
+```
+var myEnumerable = Accelatrix.Enumerable
+                             .Range(0, 10)
+                             .Select(z => new Bio.Canine(z, 2))
+                             .OfType(Bio.Mammal)
+                             .Where(z => z.NumberOfTits % 2 == 0);  // enumeration not executed
+
+var serialised = Accelatrix.Serialization.ToJSON(myEnumerable);     // enumeration not executed
+
+var newEnumeration = Accelatrix.Serialization.FromJSON(serialised); // enumeration not executed
+
+console.log(newEnumeration);
+console.log(newEnumeration.ToList());  // enumeration executed
 
 ```
 

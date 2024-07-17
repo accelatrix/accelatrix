@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.1.5";
+    const Version = "1.1.6";
     /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
@@ -263,6 +263,13 @@ export declare namespace Accelatrix {
          * @param constructorArgs The arguments to pass to the constructor, either as an ordered collection, or as a named collection.
          */
         CreateNewInstance(constructorArgs: Array<any> | object): object;
+        /**
+         * Indicates if the specified type is the same or a parent from the current type.
+         * @param type The type to compare or its name.
+         */
+        IsOfType<T extends {
+            new (...args: any[]): {};
+        }>(type: Type | T | string): boolean;
         /**
          * Indicates if the specified type is the same or a descendant from the current type.
          * @param type The type to compare or its name.
@@ -1035,6 +1042,7 @@ export {};
 
 
 
+
 declare global {
     /** Array as IEnumerable. */
     export interface Array<T> extends Accelatrix.IEnumerable<T> {
@@ -1218,50 +1226,22 @@ export declare namespace Accelatrix {
         * Sums all quantitative items in the collection.
         * @param selector An optional selector to extract only the quantitative elements of the collection.
         */
-        Sum(selector?: (element: T, index?: number) => number | IQuantity<IUnit>): number | IQuantity<IUnit>;
+        Sum(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
         /**
         * Averages all quantitative items in the collection.
         * @param selector An optional selector to extract only the quantitative elements of the collection.
         */
-        Average(selector?: (element: T, index?: number) => number | IQuantity<IUnit>): number | IQuantity<IUnit>;
+        Average(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
         /**
         * Max of all quantitative items in the collection.
         * @param selector An optional selector to extract only the quantitative elements of the collection.
         */
-        Max(selector?: (element: T, index?: number) => number | IQuantity<IUnit>): number | IQuantity<IUnit>;
+        Max(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
         /**
         * Min of all quantitative items in the collection.
         * @param selector An optional selector to extract only the quantitative elements of the collection.
         */
-        Min(selector?: (element: T, index?: number) => number | IQuantity<IUnit>): number | IQuantity<IUnit>;
-    }
-    /** Represents a unit of an IQuantity. */
-    interface IUnit {
-        /** The code of the unit, e.g. EUR. */
-        Code: string;
-        /** The given name of the unit, e.g. European Union Euro. */
-        Name?: string;
-        /** The short name, e.g. €. */
-        ShortName?: string;
-    }
-    /** A generic quantity with a unit. */
-    interface IQuantity<T extends IUnit> {
-        /** The full precision numeric amount.*/
-        Amount: number;
-        /**
-         * Gets the precision used for representation as a power of 10.
-         * Null means that the amount is to be presented in full precision.
-         * 0 or 1 means that the amount should be displayed without decimals,
-         */
-        Precision: number;
-        /** The unit of the amount. */
-        Unit: T;
-        /**
-         * Adds a number or quantity to the current number and produces a new number instance.
-         *
-         * @param operands  A single number, or a single quantity, or a collection of numbers, or a collection of quantities.
-         */
-        Add?: (operands: number | IQuantity<T> | Array<number | IQuantity<T>>) => IQuantity<T>;
+        Min(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
     }
     interface IteratorResult<T> {
         done: boolean;
@@ -1292,7 +1272,10 @@ export declare namespace Accelatrix {
         /** Commits the enumeration and gets the second element, or null, if not present. */
         private get 1();
         /** Convertion to JSON. */
-        toJSON(): Array<T>;
+        toJSON(): {
+            $type: string;
+            Members: T[][];
+        };
         /** Runs through the enumeration to produce a typed list. */
         ToList(): Array<T>;
         /** Commits the enumeration and gets its length. */
@@ -1359,9 +1342,9 @@ export declare namespace Accelatrix {
         /** Skips elements of a sequence until a duplicate is found, which relies on Equals(). */
         SkipWhileDistinct(): IEnumerable<T>;
         /**
-        * Groups the items in a collection based, and produces a map/dictionary where the key is the group and the value is a collection of the members that satisfy the key selector criteria.
-        * @param keySelector The group by criterion.
-        */
+         * Groups the items in a collection based, and produces a map/dictionary where the key is the group and the value is a collection of the members that satisfy the key selector criteria.
+         * @param keySelector The group by criterion.
+         */
         GroupBy<TIn>(keySelector: (element: T, index?: number) => TIn): IEnumerable<IGrouping<TIn, T>>;
         /**
          * Groups the items in a collection based on a key and its sequence, and produces an enumeration where the key is the group and the value is a collection of the members that satisfy the key selector criteria.
@@ -1370,9 +1353,9 @@ export declare namespace Accelatrix {
          */
         GroupByConsecutive<TIn>(keySelector: (element: T, index?: number) => TIn): IEnumerable<IGrouping<TIn, T>>;
         /**
-        * Produces the intersection of two sequences.
-        * @param sequence The sequence to intersect.
-        */
+         * Produces the intersection of two sequences.
+         * @param sequence The sequence to intersect.
+         */
         Intersect(sequence: IEnumerable<T>): IEnumerable<T>;
         /**
         * Produces the exclusion of elements from a sequence.
@@ -1380,46 +1363,41 @@ export declare namespace Accelatrix {
         */
         Except(sequence: IEnumerable<T>): IEnumerable<T>;
         /**
-        * Produces the set union of two sequences by using the default equality comparer.
-        * Different from Concat since only distinct members of the second sequence will end up in the new enumeration.
-        *
-        * @param sequence The sequence to union.
-        */
+         * Produces the set union of two sequences by using the default equality comparer.
+         * Different from Concat since only distinct members of the second sequence will end up in the new enumeration.
+         * @param sequence The sequence to union.
+         */
         Union(sequence: IEnumerable<T>): IEnumerable<T>;
         /**
-        * Bypasses a specified number of contiguous elements from the start of the sequence.
-        *
-        * @param count The number of elements to bypass.
-        */
+         * Bypasses a specified number of contiguous elements from the start of the sequence.
+         * @param count The number of elements to bypass.
+         */
         Skip(count: number): IEnumerable<T>;
         /**
-        * Returns a specified number of contiguous elements from the start of the sequence.
-        *
-        * @param count The number of elements to take.
-        */
+         * Returns a specified number of contiguous elements from the start of the sequence.
+         * @param count The number of elements to take.
+         */
         Take(count: number): IEnumerable<T>;
         /**
-        * Skips the collection while a condition is tru.
-        * @param condition The condition that while true will skip the member.
-        */
+         * Skips the collection while a condition is tru.
+         * @param condition The condition that while true will skip the member.
+         */
         SkipWhile(condition: (member: T) => boolean): IEnumerable<T>;
         /**
-        * Returns a specified number of contiguous elements from the start of the sequence.
-        * @param condition The selector of elements to take.
-        */
+         * Returns a specified number of contiguous elements from the start of the sequence.
+         * @param condition The selector of elements to take.
+         */
         TakeWhile(condition: (item: T) => boolean): IEnumerable<T>;
         /**
         * Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
-        *
-        * @param second The sequence to zip.
-        *
-        * @param resultSelector The predicate that joins an element of T and another of Tsecond and creates a TOut.
-        */
+         * @param second The sequence to zip.
+         * @param resultSelector The predicate that joins an element of T and another of Tsecond and creates a TOut.
+         */
         Zip<Tsecond, TOut>(second: IEnumerable<Tsecond>, resultSelector?: (element: T, second: Tsecond, index?: number) => TOut): IEnumerable<TOut>;
         /**
-        * Interleaves two sequences - creates a single sequence from the elements of two lists arranged in an alternate way.
-        * @param second The second enumeration to interleave with.
-        */
+         * Interleaves two sequences - creates a single sequence from the elements of two lists arranged in an alternate way.
+         * @param second The second enumeration to interleave with.
+         */
         Interleave(second: IEnumerable<T>): IEnumerable<T>;
         /**
         * Creates a dictionary from a sequence according to a specified key selector function. e.g. myPerson.ToDictionary(z => z.Id, w => w).
@@ -1434,22 +1412,22 @@ export declare namespace Accelatrix {
         * Sums all quantitative items in the collection.
         * @param selector An optional selector to extract only the quantitative elements of the collection.
         */
-        Sum(selector?: (element: T, index?: number) => number | IQuantity<IUnit>): number | IQuantity<IUnit>;
+        Sum(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
         /**
         * Averages all quantitative items in the collection.
         * @param selector An optional selector to extract only the quantitative elements of the collection.
         */
-        Average(selector?: (element: T, index?: number) => number | IQuantity<IUnit>): number | IQuantity<IUnit>;
+        Average(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
         /**
         * Max of all quantitative items in the collection.
         * @param selector An optional selector to extract only the quantitative elements of the collection.
         */
-        Max(selector?: (element: T, index?: number) => number | IQuantity<IUnit>): number | IQuantity<IUnit>;
+        Max(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
         /**
         * Min of all quantitative items in the collection.
         * @param selector An optional selector to extract only the quantitative elements of the collection.
         */
-        Min(selector?: (element: T, index?: number) => number | IQuantity<IUnit>): number | IQuantity<IUnit>;
+        Min(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
         /**
         * Creates a sequence of numbers.
         * @param start The first position of the sequence.
