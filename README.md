@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.1.6
+                                         Accelatrix v1.2.0  
 
                                    (TypeScript and ES5-compliant)
 
@@ -274,15 +274,75 @@ export module SerializationTests
 
 ```
 
+*****************************************************************************************************************
+
+                           Parallel execution with multithreading (Beta)
+
+                               a Task system with Web Workers 
 
 *****************************************************************************************************************
 
-                                Parallel execution with multithreading
+Ever wanted to cater for parallel execution in the browser, but find the Web Workers specification too low-level
+and cumbersome to be of any use?! 
+
+Do you appreciate the ellegance of C#'s Tasks and would like to have something similar in the browser?
+Always type-centric?!
+
+You reached the right place. There are still a few rough edges to iron out, but you can already get started.
+
+
+```
+// one-time init with which Scripts you need to be made available to the Workers (no DOM stuff)
+// Accelatrix already includes itself and you do not need to worry about it
+Accelatrix.Tasks.Config.Scripts.push( // ....... your scripts here
+
+// Example 1
+var myTask = new Accelatrix.Tasks.Task(z => "Hello " + z.toString(), "John Doe");
+var cancellaPromise = myTask.Start();
+
+cancellaPromise.Then(result => console.log(result))
+               .Catch(ex => console.error(ex))
+               .Finally(task => console.log(task));
+
+// Example 2
+var myData = [ new Bio.Canine.Dog(), new Bio.Canine.Wolf(), new Bio.Feline(8, 9) ]
+
+Accelatrix.Tasks.Task.StartNew(data => data.OfType(Bio.Canine).Distinct().ToList(), myData)
+                     .GetAwaiter()
+                     .Then(result => console.log(result))
+                     .Catch(ex => console.error(ex))
+                     .Finally(task => console.log(task));
+
+// Example 3: you can even pass enumerations and have them execute in the Web Worker
+var myData = Accelatrix.Enumerable.Range(0, 100000).Select(z => new Bio.Feline(z % 3 == 0, 9));  // nothing executed
+
+Accelatrix.Tasks.Task.StartNew(data => data.Distinct().ToList(), myData)
+                     .GetAwaiter()
+                     .Then(result => console.log(result))
+                     .Catch(ex => console.error(ex))
+                     .Finally(task => console.log(task));
+
+
+// Example 4: Stress load with 100 parallel requests
+Accelatrix.Enumerable.Range(0, 100)
+                     .ForEach(z =>
+                     {
+                            Accelatrix.Tasks.Task.StartNew(data => data.Distinct().ToList(), myData)
+                                                 .GetAwaiter()
+                                                 .Finally(task => console.log("Task: " + z.toString()));
+                     });
+
+```
+
 
 *****************************************************************************************************************
 
-Parallel execution with a .AsParallel() that parallelizes execution across different threads will be made
-available in the near future, e.g.:
+                                     Parallel Enumerations
+
+*****************************************************************************************************************
+
+Parallel execution of enumerations with a .AsParallel() that parallelizes execution across different threads 
+will be made available in the near future, e.g.:
 
 ```
   var myResult = myEnumeration.AsParallel()

@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.1.6";
+    const Version = "1.2.0";
     /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
@@ -1625,5 +1625,152 @@ export declare namespace Accelatrix {
         private Work;
         private UnpackCanceller;
         private AbortWorkload;
+    }
+}
+
+
+
+
+
+export declare namespace Accelatrix {
+    class Tasks {
+        /** Gets the configuation of the Tasks environment. */
+        static get Config(): Tasks.ITasksConfig;
+    }
+    /** Parallel execution system using Web Workers. */
+    namespace Tasks {
+        /** The type of source of a script made available to the Tasks engine to be presented to its Web Workers. */
+        export enum TaskScriptSource {
+            /** Remotely hosted script. */
+            Url = "Url",
+            /** Plain text JavaScript */
+            PlainText = "PlainText"
+        }
+        /** The configuation of the Tasks environment. */
+        export interface ITasksConfig {
+            /** Gets the collection of scripts available to the Tasks engine to be presented to its Web Workers. Use .push() to add more. */
+            readonly Scripts: {
+                SourceType: Tasks.TaskScriptSource;
+                Contents: string;
+            }[];
+            /** Gets or sets the maximum number of active workers at one given moment. */
+            MaxParallelism: number;
+        }
+        /** Represents the current stage in the lifecycle of a Task.  */
+        export enum TaskStatus {
+            /** The task has been initialized but has not yet been scheduled.*/
+            Created = 0,
+            /** The task is waiting to be activated and scheduled internally by the runtime. */
+            WaitingForActivation = 1,
+            /** The task has been scheduled for execution but has not yet begun executing. */
+            WaitingToRun = 2,
+            /** The task is running but has not yet completed. */
+            Running = 3,
+            /** The task has finished executing and is implicitly waiting for attached child. */
+            WaitingForChildrenToComplete = 4,
+            /** The task completed execution successfully. */
+            RanToCompletion = 5,
+            /** The task acknowledged cancellation by throwing a TaskAbortException. */
+            Canceled = 6,
+            /** The task completed due to an unhandled exception. */
+            Faulted = 7
+        }
+        /** An Exception depicting a task exception. */
+        export class TaskException extends Accelatrix.Exception {
+        }
+        /** An AbortException depicting a task cancellation. */
+        export class TaskAbortException extends TaskException {
+        }
+        /** A cencellable promise issued by a Task that is being started.. */
+        export interface ITaskPromise<TOut, TIn> extends Accelatrix.ICancellablePromise<TOut> {
+            /** Cancels an ongoing request by raising an AbortException. */
+            Cancel(): void;
+            /** Attaches a callback to the rejection of the promise. */
+            Catch(onrejected: (exception: Accelatrix.Exception) => void): ITaskPromise<TOut, TIn>;
+            /** Attaches callbacks for the resolution and/or rejection of the Promise. */
+            Then(onfulfilled: (value: TOut) => void): ITaskPromise<TOut, TIn>;
+            /** An optional callback to invoke once the request is complete. */
+            Finally(callback: (task: Task<TIn, TOut>) => void): ITaskPromise<TOut, TIn>;
+        }
+        /** The base implementation of a Task */
+        abstract class TaskBase<T, TOut> {
+            constructor(actions: Array<(arg0?: T, arg1?: any, arg2?: any) => TOut | Task<T, TOut>>, arg0?: any, arg1?: any, arg2?: any);
+            /** The set of activities in a tast. */
+            get Activity(): {
+                Actions: Array<(arg0?: T, arg1?: any, arg2?: any) => TOut | Task<T, TOut>>;
+                InputArguments: Array<any>;
+                IsBundle: boolean;
+            };
+            get Status(): TaskStatus;
+            /** Gets the result- */
+            get Result(): TOut;
+            /** Gets the exception if the Task has faulted or has been aborted. */
+            get Exception(): Accelatrix.Exception;
+            /** Gets if the task has faulted. */
+            get IsFaulted(): boolean;
+            /** Gets if the task is complete. */
+            get IsCompleted(): boolean;
+            /** Gets if the task has been canceled. */
+            get IsCanceled(): boolean;
+            /** Gets if the task does not contain an action. */
+            get IsActionless(): boolean;
+            /** If the task was created within a task. */
+            get IsNested(): boolean;
+            /** Enqueues a Task in Created status for execution. */
+            Start(): ITaskPromise<TOut, T>;
+            /** Cancels an ongoing execution and throws a new TaskAbortException if the task has started, otherwise, it will quietly resolve without errors. */
+            Cancel(): any;
+            /**
+            * Cancels an ongoing execution and throws the specified exception.
+            * @param exception A custom exception to throw instead of a TaskAbortException.
+            */
+            Cancel(exception?: Accelatrix.Exception): any;
+            /** Gets a Promise on which an async caller can await for a result. */
+            GetAwaiter(): ITaskPromise<TOut, T>;
+            /**
+            * Creates and immediatelly starts a new task executed in a separate thread. Results are presented to the OnFinished callback, or alternatively, to the GetAwaiter() promise.
+            * The Task.ImportScripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
+            * @param action The function to execute and produce a result of T or a subtask of T.
+            */
+            static StartNew<T, TOut>(action: () => T | Task<T, void>): Task<T, void>;
+            /**
+            * Creates and immediatelly starts a new task executed in a separate thread. Results are presented to the OnFinished callback, or alternatively, to the GetAwaiter() promise.
+            * @param action The function to execute and produce a result of T or a subtask of T
+            * @param arg0 An optional argument to pass onto the producing function.
+            */
+            static StartNew<T, TOut>(action: (arg0?: T) => TOut | Task<T, TOut>, arg0?: T): Task<T, TOut>;
+            /**
+            * Creates and immediatelly starts a new task executed in a separate thread. Results are presented to the OnFinished callback, or alternatively, to the GetAwaiter() promise.
+            * The Task.ImportScripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
+            * @param action The function to execute and produce a result of T or a subtask of T
+            * @param arg0 An optional argument to pass onto the producing function.
+            * @param arg1 A second optional argument to pass onto the producing function.
+            */
+            static StartNew<T, TOut>(action: (arg0?: T, arg1?: any) => TOut | Task<T, TOut>, arg0?: T, arg1?: any): Task<T, TOut>;
+            /**
+            * Creates and immediatelly starts a new task executed in a separate thread. Results are presented to the OnFinished callback, or alternatively, to the GetAwaiter() promise.
+            * The Task.ImportScripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
+            * @param action The function to execute and produce a result of T or a subtask of T
+            * @param arg0 An optional argument to pass onto the producing function.
+            * @param arg1 A second optional argument to pass onto the producing function.
+            * @param arg2 A third optional argument to pass onto the producing function.
+            */
+            static StartNew<T, TOut>(action: (arg0?: T, arg1?: any, arg2?: any) => TOut | Task<T, TOut>, arg0?: T, arg1?: any, arg2?: any): Task<T, TOut>;
+        }
+        /**
+         * A task that is executed in a separate thread.
+         * @description Mind to set the Accelatrix.Tasks.Config.Scripts property to present the baseline JS scripts/code segments to be used by Accelatrix.Tasks.\nThe code of Accelatrix will automaticallty be present in the parallelized runtime.
+         */
+        export class Task<T, TOut> extends TaskBase<T, TOut> {
+            /**
+             * Creates a new task to be executed in a separate thread.
+             * @param action The function to execute and produce a result of T or a subtask of T.
+             */
+            constructor(action: () => TOut | Task<T, TOut>);
+            constructor(action: (arg0: T) => TOut | Task<T, TOut>, arg0: T);
+            constructor(action: (arg0: T, arg1: any) => TOut | Task<T, TOut>, arg0: T, arg1: any);
+            constructor(action: (arg0: T, arg1: any, arg2: any) => TOut | Task<T, TOut>, arg0: T, arg1: any, arg2: any);
+        }
+        export {};
     }
 }
