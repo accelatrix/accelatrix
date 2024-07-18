@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.2.0";
+    const Version = "1.2.1";
     /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
@@ -1045,7 +1045,7 @@ export {};
 
 declare global {
     /** Array as IEnumerable. */
-    export interface Array<T> extends Accelatrix.IEnumerable<T> {
+    export interface Array<T> extends Accelatrix.IEnumerableOps<T> {
     }
     export interface ObjectConstructor extends Object {
         /**
@@ -1053,7 +1053,7 @@ declare global {
         * @param obj The root object to flatten.
         * @param childEnumerator The predicate that given one element retrieves the list of children.
         */
-        FlattenHierarchy<T>(obj: Object, childEnumerator: (item: T) => Accelatrix.IEnumerable<T>): Accelatrix.IEnumerable<T>;
+        FlattenHierarchy<T>(obj: Object, childEnumerator: (item: T) => Accelatrix.IEnumerableOps<T>): Accelatrix.IEnumerableOps<T>;
     }
 }
 /** Accelatrix namespace. */
@@ -1070,7 +1070,7 @@ export declare namespace Accelatrix {
     /**
     * A generic typed enumeration.
     */
-    export interface IEnumerable<T> extends IEnumerableOps<T> {
+    export interface IEnumerable<T> {
         /** Gets the enumerator to iterate through the enumeration. */
         GetEnumerator(): IEnumerator<T>;
     }
@@ -1079,24 +1079,24 @@ export declare namespace Accelatrix {
         Key: TKey;
     }
     /** Operations for enumerations. */
-    interface IEnumerableOps<T> {
+    export interface IEnumerableOps<T> extends IEnumerable<T> {
         /**
          * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
          * @param typeConstructor The type constructor, e.g. the reference to the class definition.
          */
         OfType<TFilter extends T>(typeConstructor: {
             new (...args: any[]): TFilter;
-        }): IEnumerable<TFilter>;
+        }): IEnumerableOps<TFilter>;
         /**
          * Filters members based on their type.  Type inheritance is taken into account.
          * @param type The Accelatrix.Type of the type to filter.
          */
-        OfType<TFilter extends T>(type: Accelatrix.Type): IEnumerable<TFilter>;
+        OfType<TFilter extends T>(type: Accelatrix.Type): IEnumerableOps<TFilter>;
         /**
          * Filters members based on their type.  Type inheritance is taken into account.
          * @param typeName The name or full name of the type.
          */
-        OfType<TFilter extends T>(typeName: string): IEnumerable<TFilter>;
+        OfType<TFilter extends T>(typeName: string): IEnumerableOps<TFilter>;
         /**
         * Gets if the sequence contains any elements.
         */
@@ -1110,22 +1110,22 @@ export declare namespace Accelatrix {
         *
         * @param second The second enumeration.
         */
-        Concat(second: IEnumerable<T>): IEnumerable<T>;
+        Concat(second: IEnumerable<T>): IEnumerableOps<T>;
         /**
         * Projects each element of a sequence into a new form.
         * @param selector The projection function.
         */
-        Select<TOut>(selector: (element: T, index?: number) => TOut): IEnumerable<TOut>;
+        Select<TOut>(selector: (element: T, index?: number) => TOut): IEnumerableOps<TOut>;
         /**
         * Projects each element of a sequence into an sequence and flattens the resulting sequence into one sequence, e.g. myCollection.SelectMany(z => z), or myCollection.SelectMany(z => z.Children).
         * @param selector The projection function.
         */
-        SelectMany<TOut>(selector: (element: T, index?: number) => IEnumerable<TOut>): IEnumerable<TOut>;
+        SelectMany<TOut>(selector: (element: T, index?: number) => IEnumerable<TOut>): IEnumerableOps<TOut>;
         /**
         * Filters a sequence of values based on a predicate.
         * @param selector The selector function.
         */
-        Where(selector: (element: T, index?: number) => boolean): IEnumerable<T>;
+        Where(selector: (element: T, index?: number) => boolean): IEnumerableOps<T>;
         /** Gets the first element of a sequence, or null if empty. */
         FirstOrNull(): T;
         /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
@@ -1133,7 +1133,7 @@ export declare namespace Accelatrix {
         /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
         Reverse(): Array<T>;
         /** Gets all entries which are not null, and in string enumerations, not empty or white spaces. */
-        NotNullOrEmpty(): IEnumerable<T>;
+        NotNullOrEmpty(): IEnumerableOps<T>;
         /** If a given element exists within the enumeration. */
         Contains(element: T): boolean;
         /**
@@ -1150,64 +1150,64 @@ export declare namespace Accelatrix {
         * Get the distinct members, which relies on Equals().
         * @param equalityComparer An optional comparer.
         */
-        Distinct(equalityComparer?: (a: T, b: T) => boolean): IEnumerable<T>;
+        Distinct(equalityComparer?: (a: T, b: T) => boolean): IEnumerableOps<T>;
         /** Takes elements of a sequence until a duplicate is found, which relies on Equals(). */
-        TakeWhileDistinct(): IEnumerable<T>;
+        TakeWhileDistinct(): IEnumerableOps<T>;
         /** Skips elements of a sequence until a duplicate is found, which relies on Equals(). */
-        SkipWhileDistinct(): IEnumerable<T>;
+        SkipWhileDistinct(): IEnumerableOps<T>;
         /**
         * Groups the items in a collection based, and produces a map/dictionary where the key is the group and the value is a collection of the members that satisfy the key selector criteria.
         * @param keySelector The group by criterion.
         */
-        GroupBy<TIn>(keySelector: (element: T, index?: number) => TIn): IEnumerable<IGrouping<TIn, T>>;
+        GroupBy<TIn>(keySelector: (element: T, index?: number) => TIn): IEnumerableOps<IGrouping<TIn, T>>;
         /**
         * Groups the items in a collection based on a key and its sequence, and produces an enumeration where the key is the group and the value is a collection of the members that satisfy the key selector criteria.
         * There may be groups with the same key depending on their order in the enumeration.
         * @param keySelector The group by criterion.
         */
-        GroupByConsecutive<TIn>(keySelector: (element: T, index?: number) => TIn): IEnumerable<IGrouping<TIn, T>>;
+        GroupByConsecutive<TIn>(keySelector: (element: T, index?: number) => TIn): IEnumerableOps<IGrouping<TIn, T>>;
         /**
         * Produces the intersection of two sequences.
         * @param sequence The sequence to intersect.
         */
-        Intersect(sequence: IEnumerable<T>): IEnumerable<T>;
+        Intersect(sequence: IEnumerable<T>): IEnumerableOps<T>;
         /**
         * Produces the exclusion of elements from a sequence.
         * @param sequence The sequence to subtract.
         */
-        Except(sequence: IEnumerable<T>): IEnumerable<T>;
+        Except(sequence: IEnumerable<T>): IEnumerableOps<T>;
         /**
         * Produces the set union of two sequences by using the default equality comparer.
         * Different from Concat since only distinct members of the second sequence will end up in the new enumeration.
         * @param sequence The sequence to union.
         */
-        Union(sequence: IEnumerable<T>): IEnumerable<T>;
+        Union(sequence: IEnumerable<T>): IEnumerableOps<T>;
         /**
         * Bypasses a specified number of contiguous elements from the start of the sequence.
         * @param count The number of elements to bypass.
         */
-        Skip(count: number): IEnumerable<T>;
+        Skip(count: number): IEnumerableOps<T>;
         /**
         * Returns a specified number of contiguous elements from the start of the sequence.
         * @param count The number of elements to take.
         */
-        Take(count: number): IEnumerable<T>;
+        Take(count: number): IEnumerableOps<T>;
         /**
         * Skips the sequence while a condition is true.
         * @param condition The condition that while true will skip the member.
         */
-        SkipWhile(condition: (member: T) => boolean): IEnumerable<T>;
+        SkipWhile(condition: (member: T) => boolean): IEnumerableOps<T>;
         /**
         * Returns a specified number of contiguous elements from the start of the sequence.
         * @param condition The selector of elements to take.
         */
-        TakeWhile(condition: (item: T) => boolean): IEnumerable<T>;
+        TakeWhile(condition: (item: T) => boolean): IEnumerableOps<T>;
         /**
         * Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
         * @param second The sequence to zip.
         * @param resultSelector The predicate that joins an element of T and another of Tsecond and creates a TOut.
         */
-        Zip<TSecond, TOut>(second: IEnumerable<TSecond>, resultSelector?: (element: T, second: TSecond, index?: number) => TOut): IEnumerable<TOut>;
+        Zip<TSecond, TOut>(second: IEnumerable<TSecond>, resultSelector?: (element: T, second: TSecond, index?: number) => TOut): IEnumerableOps<TOut>;
         /**
         * Interleaves two sequences - creates a single sequence from the elements of two lists arranged in an alternate way.
         * @param second The second enumeration to interleave with.
@@ -1255,7 +1255,7 @@ export declare namespace Accelatrix {
     interface IterableIterator<T> extends Iterator<T> {
     }
     /** An enumeration. */
-    export class Enumerable<T> implements IEnumerable<T> {
+    export class Enumerable<T> implements IEnumerableOps<T> {
         /**
        * Creates a new Enumeration based on an existing enumeration.
         * @param enumerable An array, an enumeration, or a factory
@@ -1274,7 +1274,7 @@ export declare namespace Accelatrix {
         /** Convertion to JSON. */
         toJSON(): {
             $type: string;
-            Members: T[][];
+            Members: any[];
         };
         /** Runs through the enumeration to produce a typed list. */
         ToList(): Array<T>;
@@ -1290,30 +1290,30 @@ export declare namespace Accelatrix {
          */
         OfType<TFilter extends T>(typeConstructorOrType: {
             new (...args: any[]): TFilter;
-        } | Accelatrix.Type | string): IEnumerable<TFilter>;
+        } | Accelatrix.Type | string): IEnumerableOps<TFilter>;
         /**
         * Projects each element of a sequence into a new form.
         *
         * @param selector The projection function.
         */
-        Select<TOut>(selector: (element: T, index?: number) => TOut): IEnumerable<TOut>;
+        Select<TOut>(selector: (element: T, index?: number) => TOut): IEnumerableOps<TOut>;
         /**
         * Concatenates one sequence after the existing.
         *
         * @param second The second enumeration.
         */
-        Concat(second: IEnumerable<T>): IEnumerable<T>;
+        Concat(second: IEnumerable<T>): IEnumerableOps<T>;
         /**
         * Projects each element of a sequence into an sequence and flattens the resulting sequence into one sequence, e.g. myCollection.SelectMany(z => z), or myCollection.SelectMany(z => z.Children)
         *
         * @param selector The projection function.
         */
-        SelectMany<TOut>(selector: (element: T, index?: number) => IEnumerable<TOut>): IEnumerable<TOut>;
+        SelectMany<TOut>(selector: (element: T, index?: number) => IEnumerable<TOut>): IEnumerableOps<TOut>;
         /**
          * Filters a sequence of values based on a predicate.
          * @param selector The filter predicate.
          */
-        Where(selector: (element: T, index?: number) => boolean): IEnumerable<T>;
+        Where(selector: (element: T, index?: number) => boolean): IEnumerableOps<T>;
         /** Gets the first element of a sequence, or null if empty. */
         FirstOrNull(): T;
         /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
@@ -1321,7 +1321,7 @@ export declare namespace Accelatrix {
         /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
         Reverse(): Array<T>;
         /** Gets all entries which are not null, and in string enumerations, not empty. */
-        NotNullOrEmpty(): IEnumerable<T>;
+        NotNullOrEmpty(): IEnumerableOps<T>;
         /** If a given element exists within the enumeration. */
         Contains(element: T): boolean;
         private static OrdinalComparer;
@@ -1336,69 +1336,69 @@ export declare namespace Accelatrix {
         */
         OrderByDescending<TKey>(comparer?: (a: T, b: T) => number | any): Array<T>;
         /** Get the distinct members, which relies on Equals(). */
-        Distinct(equalityComparer?: (a: T, b: T) => boolean): IEnumerable<T>;
+        Distinct(equalityComparer?: (a: T, b: T) => boolean): IEnumerableOps<T>;
         /** Takes elements of a sequence until a duplicate is found, which relies on Equals(). */
-        TakeWhileDistinct(): IEnumerable<T>;
+        TakeWhileDistinct(): IEnumerableOps<T>;
         /** Skips elements of a sequence until a duplicate is found, which relies on Equals(). */
-        SkipWhileDistinct(): IEnumerable<T>;
+        SkipWhileDistinct(): IEnumerableOps<T>;
         /**
          * Groups the items in a collection based, and produces a map/dictionary where the key is the group and the value is a collection of the members that satisfy the key selector criteria.
          * @param keySelector The group by criterion.
          */
-        GroupBy<TIn>(keySelector: (element: T, index?: number) => TIn): IEnumerable<IGrouping<TIn, T>>;
+        GroupBy<TIn>(keySelector: (element: T, index?: number) => TIn): IEnumerableOps<IGrouping<TIn, T>>;
         /**
          * Groups the items in a collection based on a key and its sequence, and produces an enumeration where the key is the group and the value is a collection of the members that satisfy the key selector criteria.
          * There may be groups with the same key depending on their order in the enumeration.
          * @param keySelector The group by criterion.
          */
-        GroupByConsecutive<TIn>(keySelector: (element: T, index?: number) => TIn): IEnumerable<IGrouping<TIn, T>>;
+        GroupByConsecutive<TIn>(keySelector: (element: T, index?: number) => TIn): IEnumerableOps<IGrouping<TIn, T>>;
         /**
          * Produces the intersection of two sequences.
          * @param sequence The sequence to intersect.
          */
-        Intersect(sequence: IEnumerable<T>): IEnumerable<T>;
+        Intersect(sequence: IEnumerable<T>): IEnumerableOps<T>;
         /**
         * Produces the exclusion of elements from a sequence.
         * @param sequence The sequence to subtract.
         */
-        Except(sequence: IEnumerable<T>): IEnumerable<T>;
+        Except(sequence: IEnumerable<T>): IEnumerableOps<T>;
         /**
          * Produces the set union of two sequences by using the default equality comparer.
          * Different from Concat since only distinct members of the second sequence will end up in the new enumeration.
          * @param sequence The sequence to union.
          */
-        Union(sequence: IEnumerable<T>): IEnumerable<T>;
+        Union(sequence: IEnumerable<T>): IEnumerableOps<T>;
         /**
          * Bypasses a specified number of contiguous elements from the start of the sequence.
          * @param count The number of elements to bypass.
          */
-        Skip(count: number): IEnumerable<T>;
+        Skip(count: number): IEnumerableOps<T>;
         /**
          * Returns a specified number of contiguous elements from the start of the sequence.
          * @param count The number of elements to take.
          */
-        Take(count: number): IEnumerable<T>;
+        Take(count: number): IEnumerableOps<T>;
         /**
          * Skips the collection while a condition is tru.
          * @param condition The condition that while true will skip the member.
          */
-        SkipWhile(condition: (member: T) => boolean): IEnumerable<T>;
+        SkipWhile(condition: (member: T) => boolean): IEnumerableOps<T>;
         /**
          * Returns a specified number of contiguous elements from the start of the sequence.
          * @param condition The selector of elements to take.
          */
-        TakeWhile(condition: (item: T) => boolean): IEnumerable<T>;
+        TakeWhile(condition: (item: T) => boolean): IEnumerableOps<T>;
         /**
         * Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
          * @param second The sequence to zip.
          * @param resultSelector The predicate that joins an element of T and another of Tsecond and creates a TOut.
          */
-        Zip<Tsecond, TOut>(second: IEnumerable<Tsecond>, resultSelector?: (element: T, second: Tsecond, index?: number) => TOut): IEnumerable<TOut>;
+        Zip<Tsecond, TOut>(second: IEnumerable<Tsecond>, resultSelector?: (element: T, second: Tsecond, index?: number) => TOut): IEnumerableOps<TOut>;
         /**
          * Interleaves two sequences - creates a single sequence from the elements of two lists arranged in an alternate way.
          * @param second The second enumeration to interleave with.
          */
-        Interleave(second: IEnumerable<T>): IEnumerable<T>;
+        Interleave(second: IEnumerable<T>): IEnumerableOps<T>;
         /**
         * Creates a dictionary from a sequence according to a specified key selector function. e.g. myPerson.ToDictionary(z => z.Id, w => w).
         * A JavaScript Object is, by definition, a Dictionary.
@@ -1433,7 +1433,7 @@ export declare namespace Accelatrix {
         * @param start The first position of the sequence.
         * @param count The number of items in the sequece. If none is specified, the sequence will be infinite.
         */
-        static Range(start: number, count?: number): IEnumerable<number>;
+        static Range(start: number, count?: number): IEnumerableOps<number>;
     }
     export {};
 }
