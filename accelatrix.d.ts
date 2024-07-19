@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.2.1";
+    const Version = "1.2.2";
     /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
@@ -1257,9 +1257,17 @@ export declare namespace Accelatrix {
     /** An enumeration. */
     export class Enumerable<T> implements IEnumerableOps<T> {
         /**
-       * Creates a new Enumeration based on an existing enumeration.
-        * @param enumerable An array, an enumeration, or a factory
-        */
+         * Extends the Enumerable<T> implementation and of its descendants.
+         * @param func The new functional method, e.g. Accelatrix.Enumerable.AddFunctionalMethod(function ToIndexed(item, index) { return this.Select((z, i) => ({ Item: z, Index: i })) })
+         */
+        static AddFunctionalMethod<T>(func: {
+            name: string;
+            (this: IEnumerableOps<T>, ...args: any[]): IEnumerableOps<T>;
+        }): void;
+        /**
+         * Creates a new Enumeration based on an existing enumeration.
+         * @param enumerable An array, an enumeration, or a factory
+         */
         constructor(enumerable: Array<T> | IEnumerable<T> | (() => IterableIterator<T>));
         /** Gets the enumerator to iterate through the enumeration. */
         GetEnumerator(): IEnumerator<T>;
@@ -1324,7 +1332,6 @@ export declare namespace Accelatrix {
         NotNullOrEmpty(): IEnumerableOps<T>;
         /** If a given element exists within the enumeration. */
         Contains(element: T): boolean;
-        private static OrdinalComparer;
         /**
         * Sorts the sequence in ascending order.
         * @param comparer The sorting criteria;
