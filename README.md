@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.2.3
+                                         Accelatrix v1.2.4
 
                                    (TypeScript and ES5-compliant)
 
@@ -298,11 +298,11 @@ Accelatrix.Tasks.Config.Scripts.push( // ....... your scripts here
 
 // Example 1
 var myTask = new Accelatrix.Tasks.Task(z => "Hello " + z.toString(), "John Doe");
-var cancellaPromise = myTask.Start();
+var cancellablePromise = myTask.Start();
 
-cancellaPromise.Then(result => console.log(result))
-               .Catch(ex => console.error(ex))
-               .Finally(task => console.log(task));
+cancellablrPromise.Then(result => console.log(result))
+                  .Catch(ex => console.error(ex))
+                  .Finally(task => console.log(task));
 
 // Example 2
 var myData = [ new Bio.Canine.Dog(), new Bio.Canine.Wolf(), new Bio.Feline(8, 9) ]

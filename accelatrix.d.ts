@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.2.3";
+    const Version = "1.2.4";
     /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
@@ -1668,20 +1668,16 @@ export declare namespace Accelatrix {
         export enum TaskStatus {
             /** The task has been initialized but has not yet been scheduled.*/
             Created = 0,
-            /** The task is waiting to be activated and scheduled internally by the runtime. */
-            WaitingForActivation = 1,
             /** The task has been scheduled for execution but has not yet begun executing. */
-            WaitingToRun = 2,
+            WaitingToRun = 1,
             /** The task is running but has not yet completed. */
-            Running = 3,
-            /** The task has finished executing and is implicitly waiting for attached child. */
-            WaitingForChildrenToComplete = 4,
+            Running = 2,
             /** The task completed execution successfully. */
-            RanToCompletion = 5,
+            RanToCompletion = 3,
             /** The task acknowledged cancellation by throwing a TaskAbortException. */
-            Canceled = 6,
+            Canceled = 4,
             /** The task completed due to an unhandled exception. */
-            Faulted = 7
+            Faulted = 5
         }
         /** An Exception depicting a task exception. */
         export class TaskException extends Accelatrix.Exception {
@@ -1690,6 +1686,8 @@ export declare namespace Accelatrix {
         export class TaskAbortException extends TaskException {
             constructor(message?: string);
         }
+        /** An activity in a task. */
+        export type TaskActivity<T, TOut> = ((...args: any[]) => TOut | ITask<T, TOut>) | ITask<T, TOut>;
         /** Represents a generic Task. */
         export interface ITask<T, TOut> {
             /** Enqueues a Task in Created status for execution. */
@@ -1718,8 +1716,8 @@ export declare namespace Accelatrix {
             /** Gets a Promise on which an async caller can await for a result. */
             GetAwaiter(): Tasks.ITaskPromise<TOut, T>;
             /** Gets the set of activities in the task. */
-            readonly Activity: {
-                Actions: Array<(...args: any[]) => TOut | ITask<T, TOut>>;
+            readonly Activities: {
+                Actions: Accelatrix.IEnumerableOps<TaskActivity<T, TOut>>;
                 InputArguments: Array<any>;
             };
         }
@@ -1741,18 +1739,13 @@ export declare namespace Accelatrix {
              * @param actions A collection of functions that are to be executed sequentially in a chain.
              * @param inputArguments An optional set of initial input arguments to pass onto the first function (any follow-up functions will take as input the output of the previous)
              */
-            constructor(actions: Array<(...args: any[]) => TOut | ITask<T, TOut>>, inputArguments?: {
+            constructor(actions: Accelatrix.IEnumerableOps<TaskActivity<T, TOut>>, inputArguments: {
                 0: T;
                 [key: number]: any;
             });
-            /**
-             * Creates a new TaskBase instance.
-             * @param actions An enumeration of tasks to be executed sequentially in a chain.
-             */
-            constructor(actions: Accelatrix.IEnumerableOps<ITask<T, TOut>>);
-            /** The set of activities in a TaskBase. */
-            abstract get Activity(): {
-                Actions: Array<(...args: any[]) => TOut | ITask<T, TOut>>;
+            /** Gets the set of activities */
+            get Activities(): {
+                Actions: Array<(...args: any[]) => TOut | TaskBase<T, TOut>>;
                 InputArguments: Array<any>;
             };
             get Status(): TaskStatus;
@@ -1815,39 +1808,277 @@ export declare namespace Accelatrix {
             * @param arg2 A third argument to be passed to the function.
             */
             constructor(action: (arg0: T, arg1: any, arg2: any) => TOut | ITask<T, TOut>, arg0: T, arg1: any, arg2: any);
-            /** Gets the set of activities */
-            get Activity(): {
-                Actions: Array<(...args: any[]) => TOut | TaskBase<T, TOut>>;
-                InputArguments: Array<any>;
-            };
             /**
-            * Creates and immediatelly starts a new task executed in a separate thread.
-            * The Task.ImportScripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
-            * @param action The parameterless function to execute and produce a result of T or a subtask of T.
+            * Creates and immediatelly starts a new Task executed in a separate thread.
+            * The Tasks.Config.Scripts static property must have been set once in the session.
+            * @param action The function or task to execute and produce a result of T or a subtask of T.
             */
             static StartNew<T, TOut>(action: () => TOut | ITask<T, TOut>): Task<T, void>;
             /**
-            * Creates and immediatelly starts a new task executed in a separate thread.
-            * @param action The function to execute and produce a result of T or a subtask of T
+            * Creates and immediatelly starts a new Task executed in a separate thread.
+            * @param action The function or task to execute and produce a result of T or a subtask of T.
             * @param arg0 An argument to be passed to the function.
             */
             static StartNew<T, TOut>(action: (arg0: T) => TOut | ITask<T, TOut>, arg0: T): Task<T, TOut>;
             /**
-            * Creates and immediatelly starts a new task executed in a separate thread.
-            * @param action The function to execute and produce a result of T or a subtask of T
+            * Creates and immediatelly starts a new Task executed in a separate thread.
+            * @param action The function or task to execute and produce a result of T or a subtask of T.
             * @param arg0 An argument to be passed to the function.
             * @param arg1 A second argument to be passed to the function.
             */
             static StartNew<T, TOut>(action: (arg0: T, arg1: any) => TOut | ITask<T, TOut>, arg0: T, arg1: any): Task<T, TOut>;
             /**
-            * Creates and immediatelly starts a new task executed in a separate thread.
-            * @param action The function to execute and produce a result of T or a subtask of T
+            * Creates and immediatelly starts a new Task executed in a separate thread.
+            * @param action The function or task to execute and produce a result of T or a subtask of T.
             * @param arg0 An argument to be passed to the function.
             * @param arg1 A second argument to be passed to the function.
             * @param arg2 A third argument to be passed to the function.
             */
             static StartNew<T, TOut>(action: (arg0: T, arg1: any, arg2: any) => TOut | ITask<T, TOut>, arg0: T, arg1: any, arg2: any): Task<T, TOut>;
         }
+        /** A set of sequential activities. */
+        export class ActivitySet<T, TOut> extends TaskBase<T, TOut> {
+            /**
+             * Creates a new ActivitySet instance.
+             * @param actions An enumeration of functions or Tasks that are to be executed sequentially in a chain.
+             */
+            constructor(actions: Array<TaskActivity<T, TOut>>);
+            /**
+             * Creates a new ActivitySet instance.
+             * @param actions A collection of functions or Tasks that are to be executed sequentially in a chain.
+             * @param inputArguments An optional set of initial input arguments to pass onto the first function (any follow-up functions will take as input the output of the previous)
+             */
+            constructor(actions: Array<TaskActivity<T, TOut>>, inputArguments: {
+                0: T;
+                [key: number]: any;
+            });
+            /**
+            * Creates and immediatelly starts a new ActivitySet executed in a separate thread.
+            * The Tasks.Config.Scripts static property must have been set once in the session.
+            * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
+            */
+            static StartNew<T, TOut>(actions: Array<TaskActivity<T, TOut>>): ActivitySet<T, void>;
+            /**
+            * Creates and immediatelly starts a new ActivitySet executed in a separate thread.
+            * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
+            * @param arg0 An argument to be passed to the first function.
+            */
+            static StartNew<T, TOut>(actions: Array<TaskActivity<T, TOut>>, arg0: T): ActivitySet<T, TOut>;
+            /**
+            * Creates and immediatelly starts a new ActivitySet executed in a separate thread.
+            * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
+            * @param arg0 An argument to be passed to the first function.
+            * @param arg1 A second argument to be passed to the first function.
+            */
+            static StartNew<T, TOut>(actions: Array<TaskActivity<T, TOut>>, arg0: T, arg1: any): ActivitySet<T, TOut>;
+            /**
+            * Creates and immediatelly starts a new ActivitySet executed in a separate thread.
+            * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
+            * @param arg0 An argument to be passed to the first function.
+            * @param arg1 A second argument to be passed to the first function.
+            * @param arg2 A third argument to be passed to the first function.
+            */
+            static StartNew<T, TOut>(actions: Array<TaskActivity<T, TOut>>, arg0: T, arg1: any, arg2: any): ActivitySet<T, TOut>;
+        }
         export {};
     }
+}
+
+
+
+
+
+
+
+export declare namespace Accelatrix {
+    /** Operations for enumerations. */
+    interface IEnumerableOps<T> {
+        /**
+        * Creates a new enumeration that is handled in Web Workers.
+        * The Task.ImportScripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
+        */
+        AsParallel: () => IParallelQuery<T>;
+    }
+}
+export declare module Accelatrix {
+    interface IteratorResult<T> {
+        done: boolean;
+        value: T;
+    }
+    interface Iterator<T> {
+        next(value?: any): IteratorResult<T>;
+        return?(value?: any): IteratorResult<T>;
+        throw?(e?: any): IteratorResult<T>;
+    }
+    interface IterableIterator<T> extends Iterator<T> {
+    }
+    /** An enumeration that runs in parallel. */
+    export interface IParallelQuery<T> extends Accelatrix.IEnumerable<T> {
+        /**
+         * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
+         * @param typeConstructor The type constructor, e.g. the reference to the class definition.
+         */
+        OfType<TFilter extends T>(typeConstructor: {
+            new (...args: any[]): TFilter;
+        }): IParallelQuery<TFilter>;
+        /**
+         * Filters members based on their type.  Type inheritance is taken into account.
+         * @param type The Accelatrix.Type of the type to filter.
+         */
+        OfType<TFilter extends T>(type: Accelatrix.Type): IParallelQuery<TFilter>;
+        /**
+         * Filters members based on their type.  Type inheritance is taken into account.
+         * @param typeName The name or full name of the type.
+         */
+        OfType<TFilter extends T>(typeName: string): IParallelQuery<TFilter>;
+        /**
+        * Gets if the sequence contains any elements.
+        */
+        Any(): Accelatrix.ICancellablePromise<boolean>;
+        /** Commits an enumeration as a typed list. */
+        ToList(): Accelatrix.ICancellablePromise<T>;
+        /** Iterates through each element in the enumeration and executes an action. The loop can be halted if the action returns false. */
+        /**
+        * Concatenates one sequence after the existing.
+        *
+        * @param second The second enumeration.
+        */
+        Concat(second: Accelatrix.IEnumerable<T>): IParallelQuery<T>;
+        /**
+        * Projects each element of a sequence into a new form.
+        * @param selector The projection function.
+        */
+        Select<TOut>(selector: (element: T, index?: number) => TOut): IParallelQuery<TOut>;
+        /**
+        * Projects each element of a sequence into an sequence and flattens the resulting sequence into one sequence, e.g. myCollection.SelectMany(z => z), or myCollection.SelectMany(z => z.Children).
+        * @param selector The projection function.
+        */
+        SelectMany<TOut>(selector: (element: T, index?: number) => Accelatrix.IEnumerable<TOut>): IParallelQuery<TOut>;
+        /**
+        * Filters a sequence of values based on a predicate.
+        * @param selector The selector function.
+        */
+        Where(selector: (element: T, index?: number) => boolean): IParallelQuery<T>;
+        /** Gets the first element of a sequence, or null if empty. */
+        FirstOrNull(): Accelatrix.ICancellablePromise<T>;
+        /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
+        LastOrNull(): Accelatrix.ICancellablePromise<T>;
+        /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
+        Reverse(): Array<T>;
+        /** Gets all entries which are not null, and in string enumerations, not empty or white spaces. */
+        NotNullOrEmpty(): IParallelQuery<T>;
+        /** If a given element exists within the enumeration. */
+        Contains(element: T): Accelatrix.ICancellablePromise<boolean>;
+        /**
+        * Sorts the sequence is ascending order.
+        * @param comparer The sorting criteria;
+        */
+        OrderBy(comparer?: (a: T, b: T) => number | any): IParallelQuery<T>;
+        /**
+        * Sorts the sequence in descending order.
+        * @param comparer The sorting criteria.
+        */
+        OrderByDescending(comparer?: (a: T, b: T) => number | any): IParallelQuery<T>;
+        /**
+        * Get the distinct members, which relies on Equals().
+        * @param equalityComparer An optional comparer.
+        */
+        Distinct(equalityComparer?: (a: T, b: T) => boolean): IParallelQuery<T>;
+        /** Takes elements of a sequence until a duplicate is found, which relies on Equals(). */
+        TakeWhileDistinct(): IParallelQuery<T>;
+        /** Skips elements of a sequence until a duplicate is found, which relies on Equals(). */
+        SkipWhileDistinct(): IParallelQuery<T>;
+        /**
+        * Groups the items in a collection based, and produces a map/dictionary where the key is the group and the value is a collection of the members that satisfy the key selector criteria.
+        * @param keySelector The group by criterion.
+        */
+        GroupBy<TIn>(keySelector: (element: T, index?: number) => TIn): IParallelQuery<Accelatrix.IGrouping<TIn, T>>;
+        /**
+        * Groups the items in a collection based on a key and its sequence, and produces an enumeration where the key is the group and the value is a collection of the members that satisfy the key selector criteria.
+        * There may be groups with the same key depending on their order in the enumeration.
+        * @param keySelector The group by criterion.
+        */
+        GroupByConsecutive<TIn>(keySelector: (element: T, index?: number) => TIn): IParallelQuery<Accelatrix.IGrouping<TIn, T>>;
+        /**
+        * Produces the intersection of two sequences.
+        * @param sequence The sequence to intersect.
+        */
+        Intersect(sequence: Accelatrix.IEnumerable<T>): IParallelQuery<T>;
+        /**
+        * Produces the exclusion of elements from a sequence.
+        * @param sequence The sequence to subtract.
+        */
+        Except(sequence: Accelatrix.IEnumerable<T>): IParallelQuery<T>;
+        /**
+        * Produces the set union of two sequences by using the default equality comparer.
+        * Different from Concat since only distinct members of the second sequence will end up in the new enumeration.
+        * @param sequence The sequence to union.
+        */
+        Union(sequence: Accelatrix.IEnumerable<T>): IParallelQuery<T>;
+        /**
+        * Bypasses a specified number of contiguous elements from the start of the sequence.
+        * @param count The number of elements to bypass.
+        */
+        Skip(count: number): IParallelQuery<T>;
+        /**
+        * Returns a specified number of contiguous elements from the start of the sequence.
+        * @param count The number of elements to take.
+        */
+        Take(count: number): IParallelQuery<T>;
+        /**
+        * Skips the sequence while a condition is true.
+        * @param condition The condition that while true will skip the member.
+        */
+        SkipWhile(condition: (member: T) => boolean): IParallelQuery<T>;
+        /**
+        * Returns a specified number of contiguous elements from the start of the sequence.
+        * @param condition The selector of elements to take.
+        */
+        TakeWhile(condition: (item: T) => boolean): IParallelQuery<T>;
+        /**
+        * Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
+        * @param second The sequence to zip.
+        * @param resultSelector The predicate that joins an element of T and another of Tsecond and creates a TOut.
+        */
+        Zip<TSecond, TOut>(second: Accelatrix.IEnumerable<TSecond>, resultSelector?: (element: T, second: TSecond, index?: number) => TOut): IParallelQuery<TOut>;
+        /**
+        * Interleaves two sequences - creates a single sequence from the elements of two lists arranged in an alternate way.
+        * @param second The second enumeration to interleave with.
+        */
+        Interleave(second: Accelatrix.IEnumerable<T>): IParallelQuery<T>;
+        /**
+        * Creates a dictionary from a sequence according to a specified key selector function. e.g. myPerson.ToDictionary(z => z.Id, w => w).
+        * A JavaScript Object is, by definition, a Dictionary.
+        * @param keySelector A function to extract the key from each element.
+        * @param valueSelector A function to extract the value from each element.
+        */
+        ToDictionary<TOut>(keySelector: (element: T, index?: number) => string, valueSelector: (element: T, index?: number) => TOut): Accelatrix.ICancellablePromise<{
+            [key: string]: TOut;
+        }>;
+        /**
+        * Sums all quantitative items in the collection.
+        * @param selector An optional selector to extract only the quantitative elements of the collection.
+        */
+        Sum(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.ICancellablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+        /**
+        * Averages all quantitative items in the collection.
+        * @param selector An optional selector to extract only the quantitative elements of the collection.
+        */
+        Average(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.ICancellablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+        /**
+        * Max of all quantitative items in the collection.
+        * @param selector An optional selector to extract only the quantitative elements of the collection.
+        */
+        Max(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.ICancellablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+        /**
+        * Min of all quantitative items in the collection.
+        * @param selector An optional selector to extract only the quantitative elements of the collection.
+        */
+        Min(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.ICancellablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+    }
+    /** An enumeration that runs in parallel. */
+    export const ParallelQuery: {
+        new <T>(arg: Array<T> | Accelatrix.IEnumerable<T> | (() => IterableIterator<T>)): IParallelQuery<T>;
+    };
+    export {};
 }
