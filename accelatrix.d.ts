@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.2.6";
+    const Version = "1.2.7";
     /** A base exception. */
     class Exception extends Error {
         /** Gets the message of the exception. */
@@ -1782,7 +1782,7 @@ export declare namespace Accelatrix {
             static CancelAll(): void;
         }
         /**
-         * A task that is executed in a separate thread.
+         * A single-activity Task that is executed in a separate thread.
          * @description Mind to set the Accelatrix.Tasks.Config.Scripts property to present the baseline JS scripts/code segments to be used by Accelatrix.Tasks.\nThe code of Accelatrix will automaticallty be present in the parallelized runtime.
          */
         export class Task<T, TOut> extends TaskBase<T, TOut> {
@@ -1840,7 +1840,7 @@ export declare namespace Accelatrix {
             */
             static StartNew<T, TOut>(action: (arg0: T, arg1: any, arg2: any) => TOut | ITask<T, TOut>, arg0: T, arg1: any, arg2: any): Task<T, TOut>;
         }
-        /** A set of sequential activities. */
+        /** A set of chained sequential activities executed in a separate thread. */
         export class ActivitySet<T, TOut> extends TaskBase<T, TOut> {
             /**
              * Creates a new ActivitySet instance.
@@ -1884,7 +1884,7 @@ export declare namespace Accelatrix {
             */
             static StartNew<T, TOut>(actions: Array<TaskActivity<T, TOut>>, arg0: T, arg1: any, arg2: any): ActivitySet<T, TOut>;
         }
-        /** A coninuous set of sequential activities. */
+        /** A continuous stream of chained sequential activities executed in a separate thread. The task completes during the first exception, or at the end of the stream. */
         export class ActivityStream<T, TOut> extends TaskBase<T, TOut> {
             /**
              * Creates a new ActivitySet instance.
@@ -1928,41 +1928,49 @@ export declare namespace Accelatrix {
             */
             static StartNew<T, TOut>(actions: Accelatrix.IEnumerableOps<TaskActivity<T, TOut>>, arg0: T, arg1: any, arg2: any): ActivityStream<T, TOut>;
         }
-        /** A set of parallel activities that jointly collaborate to produce a consolidated result. */
+        /**
+         *  A set of parallel activities that jointly collaborate to produce a consolidated result.
+         *  The ComnbinedTask will conclude once all Tasks have successfully completed, or when the first exception is thrown. The OnPartialResult callback provides the means to interrupt the process.
+        */
         export class ComnbinedTask<T, TOut extends Array<TOut>> extends TaskBase<T, TOut> {
             /**
              * Creates a new ComnbinedTask instance.
              * @param actions An enumeration of functions or Tasks that are to be executed parallely to contribute to a combined result.
              */
-            constructor(actions: Accelatrix.IEnumerableOps<TaskActivity<T, TOut>>);
+            constructor(actions: Array<TaskActivity<T, TOut>>);
             /**
              * Creates a new ComnbinedTask instance.
              * @param actions An enumeration of functions or Tasks that are to be executed parallely to contribute to a combined result.
              * @param inputArguments An optional set of initial input arguments to pass onto the each member.
              */
-            constructor(actions: Accelatrix.IEnumerableOps<TaskActivity<T, TOut>>, inputArguments: {
+            constructor(actions: Array<TaskActivity<T, TOut>>, inputArguments: {
                 0: T;
                 [key: number]: any;
             });
+            /**
+             * Allows to subscribe to partial results.
+             * @returns  Returns the same CombinedTask instance.
+             */
+            OnPartialResult(): (onPartialResult: (result: TOut) => void) => ComnbinedTask<T, TOut>;
             /**
             * Creates and immediatelly starts a new ComnbinedTask executed parallely in separate threads.
             * The Tasks.Config.Scripts static property must have been set once in the session.
             * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
             */
-            static StartNew<T, TOut extends Array<TOut>>(actions: Accelatrix.IEnumerableOps<TaskActivity<T, TOut>>): ComnbinedTask<T, TOut>;
+            static StartNew<T, TOut extends Array<TOut>>(actions: Array<TaskActivity<T, TOut>>): ComnbinedTask<T, TOut>;
             /**
             * Creates and immediatelly starts a new ComnbinedTask executed parallely in separate threads.
             * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
             * @param arg0 An argument to be passed.
             */
-            static StartNew<T, TOut extends Array<TOut>>(actions: Accelatrix.IEnumerableOps<TaskActivity<T, TOut>>, arg0: T): ComnbinedTask<T, TOut>;
+            static StartNew<T, TOut extends Array<TOut>>(actions: Array<TaskActivity<T, TOut>>, arg0: T): ComnbinedTask<T, TOut>;
             /**
             * Creates and immediatelly starts a new ComnbinedTask executed parallely in separate threads.
             * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
             * @param arg0 An argument to be passed.
             * @param arg1 A second argument to be passed.
             */
-            static StartNew<T, TOut extends Array<TOut>>(actions: Accelatrix.IEnumerableOps<TaskActivity<T, TOut>>, arg0: T, arg1: any): ComnbinedTask<T, TOut>;
+            static StartNew<T, TOut extends Array<TOut>>(actions: Array<TaskActivity<T, TOut>>, arg0: T, arg1: any): ComnbinedTask<T, TOut>;
             /**
             * Creates and immediatelly starts a new ComnbinedTask executed parallely in separate threads.
             * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
@@ -1970,7 +1978,7 @@ export declare namespace Accelatrix {
             * @param arg1 A second argument to be passed.
             * @param arg2 A third argument to be passed.
             */
-            static StartNew<T, TOut extends Array<TOut>>(actions: Accelatrix.IEnumerableOps<TaskActivity<T, TOut>>, arg0: T, arg1: any, arg2: any): ComnbinedTask<T, TOut>;
+            static StartNew<T, TOut extends Array<TOut>>(actions: Array<TaskActivity<T, TOut>>, arg0: T, arg1: any, arg2: any): ComnbinedTask<T, TOut>;
         }
         export {};
     }
