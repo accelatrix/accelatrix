@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.2.7  
+                                         Accelatrix v1.2.8  
 
                                    (TypeScript and ES5-compliant)
 
@@ -276,7 +276,7 @@ export module SerializationTests
 
 *****************************************************************************************************************
 
-                           Parallel execution with multithreading (Beta)
+                           Parallel execution with multithreading
 
                                a Task system with Web Workers 
 
@@ -331,6 +331,17 @@ Accelatrix.Enumerable.Range(0, 100)
                                                  .GetAwaiter()
                                                  .Finally(task => console.log("Task: " + z.toString()));
                      });
+
+// Example 5: Combine tasks into a single resultset
+Accelatrix.Tasks.ComnbinedTask.StartNew([
+                                            new Accelatrix.Tasks.Task((a, b) => Accelatrix.Enumerable.Range(a, b).ToList(), 0, 20),
+                                            new Accelatrix.Tasks.Task(() => Accelatrix.Enumerable.Range(20, 20).ToList()),
+                                            () => Accelatrix.Enumerable.Range(40, 20).ToList(),
+                                        ])
+                              .GetAwaiter()
+                              .Then(result => console.log(result))
+                              .Catch(ex => console.error(ex))
+                              .Finally(task => console.log(task));                   
 
 ```
 
