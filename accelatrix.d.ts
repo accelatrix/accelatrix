@@ -26,9 +26,10 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.2.8";
+    const Version = "1.2.9";
     /** A base exception. */
     class Exception extends Error {
+        constructor(message: string);
         /** Gets the message of the exception. */
         get Message(): string;
     }
@@ -69,12 +70,6 @@ export declare namespace Accelatrix {
          * @param message The message.
          */
         constructor(message: string);
-        /**
-         * Indicates if a given exception represents an abandonement of an ongoing request.
-         * @param exception The exception to probe.
-         * @returns Returns if the supplied exception represents an abandonement of an ongoing request.
-         */
-        static IsAbort(exception: Exception): boolean;
     }
     /**
      * Decorator to mark and make classes immutable.
@@ -1685,6 +1680,7 @@ export declare namespace Accelatrix {
         }
         /** An Exception depicting a task exception. */
         export class TaskException extends Accelatrix.Exception {
+            constructor(message: any);
         }
         /** An AbortException depicting a task cancellation. */
         export class TaskAbortException extends TaskException {
@@ -1979,6 +1975,68 @@ export declare namespace Accelatrix {
             * @param arg2 A third argument to be passed.
             */
             static StartNew<T, TOut extends Array<TOut>>(actions: Array<TaskActivity<T, TOut>>, arg0: T, arg1: any, arg2: any): ComnbinedTask<T, TOut>;
+        }
+        /**
+         * An activity that can maintain state between concurrent tasks.
+         * @example
+         * var shared = Accelatrix.Tasks.StatefulActivity();
+         *
+         * Accelatrix.Tasks.ComnbinedTask.StartNew([
+         *			   new Accelatrix.Tasks.ActivitySet([
+         *								z => z.Take(1),
+         *								shared.PushAndEvaluate(z => 1,
+         *                                                     (accumulated, mine) => accumulated.Where(z => z != null).Any()
+         *                                                                            ? z => z.Take(0)
+         *                                                                            : z => z ),
+         * 		 					    z => z.ToList()
+         *						  ],
+         *						  [[0, 1, 2, 3, 4, 5]]),
+         *
+         *			   new Accelatrix.Tasks.ActivitySet([
+         *								z => z.Take(3),
+         *								shared.PushAndEvaluate(z => 3,
+         *                                                     (accumulated, mine) => accumulated.Where(z => z != null).Any()
+         *                                                                            ? z => z.Take(0)
+         *                                                                            : z => z.Take(1) ),
+         *							    z => z.ToList()
+         * 						   ],
+         *						   [[6, 7, 8, 9,10, 11]])
+         *		   ])
+         *         .GetAwaiter()
+         *         .Then(z => console.log(z))
+         *         .Catch(ex => console.error(ex))
+         *         .Finally(t => shared.Dispose())
+         */
+        export class StatefulActivity<T> extends Function {
+            constructor();
+            /** Gets the unique id of the current StatefulActivity instance. */
+            get Id(): string;
+            /** Reads the dataset stored in the StatefulActivity. */
+            Read(): StatefulActivity<Array<T>>;
+            /**
+             * Reads the dataset stored in the StatefulActivity and pushes an additional set.
+             * @param dataTransform An optional function to transform the data received into the data being pushed into the state, for example, pushing the .GetHashCode() of the data instead of the data itself for faster performance.
+             */
+            ReadAndPush<TOut>(dataTransform: (data: T) => TOut): StatefulActivity<Array<T>>;
+            /**
+             * Pushes additional state into the StatefulActivity.
+             * @param dataTransform An optional function to transform the data received into the data being pushed into the state, for example, pushing the .GetHashCode() of the data instead of the data itself for faster performance.
+             */
+            Push<TOut>(dataTransform: (data: T) => TOut): StatefulActivity<T>;
+            /**
+             * Discards any existing data already pushed into the StatefulActivity by setting its value.
+             * @param dataTransform An optional function to transform the data received into the data being pushed into the state, for example, pushing the .GetHashCode() of the data instead of the data itself for faster performance.
+             */
+            Set<TOut>(dataTransform: (data: T) => TOut): StatefulActivity<T>;
+            /**
+             * Pushes additional state into the StatefulActivity and evalutes the state to produce a follow-up action to apply only on the unstransformed state being pushed.
+             * @param dataTransform An optional function to transform the data received into the data being pushed into the state, for example, pushing the .GetHashCode() of the data instead of the data itself for faster performance.
+             * @param evaluator The function that receives the existing state and the new delta being pushed and produces a follow-up action to be applied to to the original data being pushed before transformation.
+             */
+            PushAndEvaluate<TOut>(dataTransform: (data: T) => TOut, evaluator: (accumulatedData: Array<TOut>, newData: TOut) => ((data: T) => any)): StatefulActivity<T>;
+            /** Frees up any resources consumed by the current StatefulActivity, typically called durinf the .Finally() callback of a CombinedTask. */
+            Dispose(): void;
+            toJSON(): any;
         }
         export {};
     }

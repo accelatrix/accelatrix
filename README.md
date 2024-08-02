@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.2.8  
+                                         Accelatrix v1.2.9  
 
                                    (TypeScript and ES5-compliant)
 
@@ -288,11 +288,9 @@ and cumbersome to be of any use?!
 Do you appreciate the ellegance of C#'s Tasks and would like to have something similar in the browser?
 Always type-centric?!
 
-You reached the right place. There are still a few rough edges to iron out, but you can already get started.
-
 
 ```
-// one-time init with which Scripts you need to be made available to the Workers (no DOM stuff)
+// one-time init with the Scripts made available to the Workers (no DOM stuff)
 // Accelatrix already includes itself and you do not need to worry about it
 Accelatrix.Tasks.Config.Scripts.push( // ....... your scripts here
 
@@ -332,6 +330,7 @@ Accelatrix.Enumerable.Range(0, 100)
                                                  .Finally(task => console.log("Task: " + z.toString()));
                      });
 
+
 // Example 5: Combine tasks into a single resultset
 Accelatrix.Tasks.ComnbinedTask.StartNew([
                                             new Accelatrix.Tasks.Task((a, b) => Accelatrix.Enumerable.Range(a, b).ToList(), 0, 20),
@@ -343,6 +342,35 @@ Accelatrix.Tasks.ComnbinedTask.StartNew([
                               .Catch(ex => console.error(ex))
                               .Finally(task => console.log(task));                   
 
+
+// Example 6: Share state between parallel activies (with a cost!)
+// This example will produce a single result from the task that runs first
+var shared = Accelatrix.Tasks.StatefulActivity();
+
+Accelatrix.Tasks.ComnbinedTask.StartNew([
+					   new Accelatrix.Tasks.ActivitySet([
+										z => z.Take(1),
+										shared.PushAndEvaluate(z => 1,
+                                                               (accumulated, mine) => accumulated.Where(z => z != null).Any()
+                                                                                      ? z => z.Take(0)
+                                                                                      : z => z ),
+										z => z.ToList()
+									  ],
+									  [[0, 1, 2, 3, 4, 5]]),
+					   new Accelatrix.Tasks.ActivitySet([
+										z => z.Take(3),
+										shared.PushAndEvaluate(z => 3,
+                                                               (accumulated, mine) => accumulated.Where(z => z != null).Any()
+                                                                                      ? z => z.Take(0)
+                                                                                      : z => z.Take(1) ),
+										z => z.ToList()
+									  ],
+									  [[6, 7, 8, 9,10, 11]])
+					])
+			       .GetAwaiter()
+			       .Then(z => console.log(z))
+			       .Catch(ex => console.error(ex))
+                   .Finally(t => shared.Dispose())
 ```
 
 
@@ -352,7 +380,7 @@ Accelatrix.Tasks.ComnbinedTask.StartNew([
 
 *****************************************************************************************************************
 
-Parallel execution of enumerations with a .AsParallel() that parallelizes execution across different threads 
+Parallel execution of enumerations with a .AsParallel() that parallelises execution across different threads 
 will be made available in the near future, e.g.:
 
 ```
