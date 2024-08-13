@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.2.10  
+                                         Accelatrix v1.3.0  
 
                                    (TypeScript and ES5-compliant)
 
@@ -24,7 +24,7 @@ Accelatrix is compatible with ES5 and provides a C#-like runtime in the browser,
     - Equals()
     - ToString()
 
-You can now deal with classes in the browser at runtime as you would in C#, e.g.:
+You can now deal with classes in JavaScript at runtime as you would in C#, e.g.:
 
 ```
 var myDog = new Bio.Mamal(8);  
@@ -152,7 +152,7 @@ now enumerations as well, e.g.:
 
 *****************************************************************************************************************
 
-In order to control the serialzation process, the Type-centric JSON serializer makes several decorators available:
+In order to control the serialzation process, the type-centric JSON serializer makes several decorators available:
 
     - @KnownType
     - @DataMember
@@ -163,7 +163,7 @@ In order to control the serialzation process, the Type-centric JSON serializer m
 
 allowing for TypeScript properties to be stringified, but not the underlying members.
 
-The deserialization also respects types and deserializes to classes instead of plain objects.
+The deserialization also respects types and deserializes to classes instead of plain object.
 
 
 ```
@@ -298,7 +298,7 @@ Accelatrix.Tasks.Config.Scripts.push( // ....... your scripts here
 var myTask = new Accelatrix.Tasks.Task(z => "Hello " + z.toString(), "John Doe");
 var cancellablePromise = myTask.Start();
 
-cancellablrPromise.Then(result => console.log(result))
+cancellablePromise.Then(result => console.log(result))
                   .Catch(ex => console.error(ex))
                   .Finally(task => console.log(task));
 
@@ -370,22 +370,29 @@ Accelatrix.Tasks.ComnbinedTask.StartNew([
 			       .GetAwaiter()
 			       .Then(z => console.log(z))
 			       .Catch(ex => console.error(ex))
-                   .Finally(t => shared.Dispose())
+			       .Finally(t => shared.Dispose())
 ```
 
 
 *****************************************************************************************************************
 
                                      Parallel Enumerations
+                                           (Beta)
 
 *****************************************************************************************************************
 
 Parallel execution of enumerations with a .AsParallel() that parallelises execution across different threads 
-will be made available in the near future, e.g.:
+is possible with the .AsParallel() function, e.g.:
 
 ```
-  var myResult = myEnumeration.AsParallel()
-                              .Skip(2)
-                              .Take(10)
-                              .ToList();
-```                              
+Accelatrix.Enumerable.Range(0, 100)
+                     .Select(z => "Item " + z.toString())
+                     .Skip(2)
+                     .Take(10)
+                     .AsParallel()
+                     .GetAwaiter()
+                     .Then(z => console.log(z))
+                     .Catch(ex => console.error(ex))
+```     
+
+This is a Beta release and .GroupBy() is still not fully supported.
