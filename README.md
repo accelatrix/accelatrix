@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.3.0  
+                                         Accelatrix v1.3.2  
 
                                    (TypeScript and ES5-compliant)
 
@@ -27,13 +27,13 @@ Accelatrix is compatible with ES5 and provides a C#-like runtime in the browser,
 You can now deal with classes in JavaScript at runtime as you would in C#, e.g.:
 
 ```
-var myDog = new Bio.Mamal(8);  
+var myDog = new Bio.Mammal(8);  
 var myCat = new Bio.Feline(8, 9);
 
 var timeIsSame = (new Date()).Equals(new Date());                //true           
 var areEqual = myDog.Equals(myCat);                              // false           
 var myCatType = myCat.GetType();                                 // Bio.Feline           
-var myCatBaseType = myCat.GetType().BaseType;                    // Bio.Mamal           
+var myCatBaseType = myCat.GetType().BaseType;                    // Bio.Mammal           
 var isAnimal = myCat.GetType().IsAssignableFrom(Bio.Animal);     // true           
 var enums = Bio.TypesOfLocomotion.GetType();                     // Accelatrix.EnumType 
 ```
@@ -131,18 +131,44 @@ You can now use your favourite LINQ operator functions operating on enumerations
 now enumerations as well, e.g.:
 
 ```
-  var myEnumeration = Accelatrix.Enumerable.Range(0, 10000000)
-                                           .Select(z => i % 2 == 0
-                                                        ? new Bio.Feline(z % 10, 9)
-                                                        : new Bio.Mamal(z % 10))
-                                           .OfType(Bio.Mamal)
-                                           .Where(z => z.NumberOfTits != 1)
-                                           .GroupBy(z => z.NumberOfTits)
+  var myEnumeration = Accelatrix.Collections.Enumerable.Range(0, 10000000)
+                                            .Select(z => z % 6
+                                                         ? new Bio.Feline(z % 10, 9)
+                                                         : new Bio.Mammal(z % 10))
+                                            .OfType(Bio.Mammal)
+                                            .Where(z => z.NumberOfTits != 1)
+                                            .GroupBy(z => z.NumberOfTits)
 
   var myResult = myEnumeration.Skip(2)
-                              .Take(10)
+                              .Take(4)
                               .ToList()
                               .OrderBy(z => z.NumberOfTits);
+```                              
+
+
+*****************************************************************************************************************
+
+                               Async Enumerations and Functional Programming
+
+*****************************************************************************************************************
+
+You can now use your favourite LINQ operator functions operating on enumerations where members are calculated
+async and are (cancellable) promises e.g.:
+
+```
+  var myEnumeration = new Accelatrix.Collections.AsyncEnumerable(Accelatrix.Collections.Enumerable.Range(0, 10000000))
+                                                .Select(z => Accelatrix.AsyncChainer.Chain(z, r => r)) // creates promise
+                                                .Select(z => z % 6
+                                                            ? new Bio.Feline(z % 10, 9)
+                                                            : new Bio.Mammal(z % 10))
+                                                .OfType(Bio.Mammal)
+                                                .Where(z => z.NumberOfTits != 1)
+                                                .GroupBy(z => z.NumberOfTits)
+                                                .Skip(2)
+                                                .Take(4)
+                                            
+  myEnumeration.ToList().then(z => console.log(z));
+
 ```                              
 
 
@@ -180,7 +206,7 @@ console.log(y.GetType())  // SerializableClass
 Even Enumerations with their functions can be serialised and deserialised:
 
 ```
-var myEnumerable = Accelatrix.Enumerable
+var myEnumerable = Accelatrix.Collections.Enumerable
                              .Range(0, 10)
                              .Select(z => new Bio.Canine(z, 2))
                              .OfType(Bio.Mammal)
@@ -312,7 +338,7 @@ Accelatrix.Tasks.Task.StartNew(data => data.OfType(Bio.Canine).Distinct().ToList
                      .Finally(task => console.log(task));
 
 // Example 3: you can even pass enumerations and have them execute in the Web Worker
-var myData = Accelatrix.Enumerable.Range(0, 100000).Select(z => new Bio.Feline(z % 3 == 0, 9));  // nothing executed
+var myData = Accelatrix.Collections.Enumerable.Range(0, 100000).Select(z => new Bio.Feline(z % 3 == 0, 9));  // nothing executed
 
 Accelatrix.Tasks.Task.StartNew(data => data.Distinct().ToList(), myData)
                      .GetAwaiter()
@@ -322,7 +348,7 @@ Accelatrix.Tasks.Task.StartNew(data => data.Distinct().ToList(), myData)
 
 
 // Example 4: Stress load with 100 parallel requests
-Accelatrix.Enumerable.Range(0, 100)
+Accelatrix.Collections.Enumerable.Range(0, 100)
                      .ForEach(z =>
                      {
                             Accelatrix.Tasks.Task.StartNew(data => data.Distinct().ToList(), myData)
@@ -332,10 +358,10 @@ Accelatrix.Enumerable.Range(0, 100)
 
 
 // Example 5: Combine tasks into a single resultset
-Accelatrix.Tasks.ComnbinedTask.StartNew([
-                                            new Accelatrix.Tasks.Task((a, b) => Accelatrix.Enumerable.Range(a, b).ToList(), 0, 20),
-                                            new Accelatrix.Tasks.Task(() => Accelatrix.Enumerable.Range(20, 20).ToList()),
-                                            () => Accelatrix.Enumerable.Range(40, 20).ToList(),
+Accelatrix.Tasks.CombinedTask.StartNew([
+                                            new Accelatrix.Tasks.Task((a, b) => Accelatrix.Collections.Enumerable.Range(a, b).ToList(), 0, 20),
+                                            new Accelatrix.Tasks.Task(() => Accelatrix.Collections.Enumerable.Range(20, 20).ToList()),
+                                            () => Accelatrix.Collections.Enumerable.Range(40, 20).ToList(),
                                         ])
                               .GetAwaiter()
                               .Then(result => console.log(result))
@@ -347,7 +373,7 @@ Accelatrix.Tasks.ComnbinedTask.StartNew([
 // This example will produce a single result from the task that runs first
 var shared = Accelatrix.Tasks.StatefulActivity();
 
-Accelatrix.Tasks.ComnbinedTask.StartNew([
+Accelatrix.Tasks.CombinedTask.StartNew([
 					   new Accelatrix.Tasks.ActivitySet([
 										z => z.Take(1),
 										shared.PushAndEvaluate(z => 1,
@@ -385,14 +411,15 @@ Parallel execution of enumerations with a .AsParallel() that parallelises execut
 is possible with the .AsParallel() function, e.g.:
 
 ```
-Accelatrix.Enumerable.Range(0, 100)
-                     .Select(z => "Item " + z.toString())
-                     .Skip(2)
-                     .Take(10)
-                     .AsParallel()
-                     .GetAwaiter()
-                     .Then(z => console.log(z))
-                     .Catch(ex => console.error(ex))
+Accelatrix.Collections.Enumerable
+                      .Range(0, 100)
+                      .Select(z => "Item " + z.toString())
+                      .Skip(2)
+                      .Take(10)
+                      .AsParallel() // sends everything to threads
+                      .GetAwaiter()
+                      .Then(z => console.log(z))
+                      .Catch(ex => console.error(ex))
 ```     
 
 This is a Beta release and .GroupBy() is still not fully supported.
