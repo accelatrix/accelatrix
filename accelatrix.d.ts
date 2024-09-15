@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.3.2";
+    const Version = "1.3.3";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1753,8 +1753,6 @@ export declare namespace Accelatrix {
 
 
 
-
-
 export declare namespace Accelatrix {
     class Tasks {
         /** Gets the configuation of the Tasks environment. */
@@ -2152,6 +2150,13 @@ export declare namespace Accelatrix {
              * @param evaluator The function that receives the existing state and the new delta being pushed and produces a follow-up action to be applied to to the original data being pushed before transformation.
              */
             PushAndEvaluate<TOut>(dataTransform: (data: T) => TOut, evaluator: (accumulatedData: Array<TOut>, newData: TOut) => ((data: T) => any)): StatefulActivity<T>;
+            /**
+             * In a continuous manner, pushes additional state into the StatefulActivity as a buffer and evalutes the state to produce a follow-up action to apply only on the unstransformed state being pushed.
+             * @param dataTransform An optional function to transform the data received into the data being pushed into the state, for example, pushing the .GetHashCode() of the data instead of the data itself for faster performance.
+             * @param evaluator The function that receives the existing state and the new delta being pushed and produces a follow-up action to be applied to to the original data being pushed before transformation.
+             * @param bufferSize How many elements are to be submitted during each push and evaluation cycle.
+             */
+            StreamPushAndEvaluate<TOut>(dataTransform: (data: T) => TOut, evaluator: (accumulatedData: Array<TOut>, newData: TOut) => ((data: T) => any), bufferSize?: number): StatefulActivity<T>;
             /** Frees up any resources consumed by the current StatefulActivity, typically called durinf the .Finally() callback of a CombinedTask. */
             Dispose(): void;
             toJSON(): any;
@@ -2171,14 +2176,16 @@ export declare namespace Accelatrix {
     namespace Collections {
         /** An enumeration that runs in parallel. */
         interface IEnumerableAsyncOps<T> extends Accelatrix.Collections.IEnumerable<T> {
-            /** Runs the parallel query and provides the outcome in the form of a cancellable promise. */
-            GetAwaiter(): Accelatrix.ICancellablePromise<Array<T>>;
+            /** Freezes the current enumeration so that the position of the iterator is retained during subsquent calls. */
+            Freeze(): IEnumerableAsyncOps<T>;
             /** Gets if the sequence contains any elements. */
             Any(): Accelatrix.ICancellablePromise<boolean>;
             /** If a given element exists within the enumeration. */
             Contains(element: T | PromiseLike<T>): Accelatrix.ICancellablePromise<boolean>;
             /** Gets the first element of a sequence, or null if empty, but the order is random and not necessarily the order at input. */
             FirstOrNull(): Accelatrix.ICancellablePromise<T>;
+            /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
+            LastOrNull(): Accelatrix.ICancellablePromise<T>;
             /**
             * Creates a HashMap from a sequence according to a specified key selector function. e.g. myPerson.ToDictionary(z => z.Id, w => w).
             * @param keySelector A function to extract the key from each element.
@@ -2331,7 +2338,7 @@ export declare namespace Accelatrix {
         }
         /** An enumeration that can cope with async members. */
         const AsyncEnumerable: {
-            new <T>(arg: Accelatrix.Collections.IEnumerableOps<T | PromiseLike<T>> | IEnumerableAsyncOps<T> | (() => IterableIterator<T | Promise<T>>)): IEnumerableAsyncOps<T>;
+            new <T>(arg: Accelatrix.Collections.IEnumerableOps<T | PromiseLike<T>> | IEnumerableAsyncOps<T> | (() => IterableIterator<T | Promise<T>>)): Accelatrix.Collections.Enumerable<T> & IEnumerableAsyncOps<T>;
         };
     }
 }
@@ -2347,7 +2354,7 @@ declare global {
         * Creates a new enumeration that is handled in Web Workers.
         * The Tasks.Config.Scripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
         */
-        AsParallel: () => AccelatrixEnumerable.Collections.IEnumerableAsyncOps<T>;
+        AsParallel: () => Accelatrix.Collections.IEnumerableAsyncOps<T>;
     }
 }
 export declare namespace Accelatrix {
@@ -2357,7 +2364,7 @@ export declare namespace Accelatrix {
         * Creates a new enumeration that is handled in Web Workers.
         * The Tasks.Config.Scripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
         */
-        AsParallel: () => AccelatrixEnumerable.Collections.IEnumerableAsyncOps<T>;
+        AsParallel: () => Accelatrix.Collections.IEnumerableAsyncOps<T>;
     }
 }
 export declare namespace Accelatrix {
@@ -2380,7 +2387,7 @@ export declare namespace Accelatrix {
         }
         /** An enumeration that runs in parallel. */
         export const ParallelQuery: {
-            new <T>(arg: Array<T> | Accelatrix.Collections.IEnumerableOps<T> | (() => IterableIterator<T>)): AccelatrixEnumerable.Collections.IEnumerableAsyncOps<T>;
+            new <T>(arg: Array<T> | Accelatrix.Collections.IEnumerableOps<T> | (() => IterableIterator<T>)): Accelatrix.Collections.IEnumerableAsyncOps<T>;
         };
         export {};
     }

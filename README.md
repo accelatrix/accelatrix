@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.3.2  
+                                         Accelatrix v1.3.3  
 
                                    (TypeScript and ES5-compliant)
 
@@ -132,7 +132,7 @@ now enumerations as well, e.g.:
 
 ```
   var myEnumeration = Accelatrix.Collections.Enumerable.Range(0, 10000000)
-                                            .Select(z => z % 6
+                                            .Select(z => z % 2 == 0
                                                          ? new Bio.Feline(z % 10, 9)
                                                          : new Bio.Mammal(z % 10))
                                             .OfType(Bio.Mammal)
@@ -158,7 +158,7 @@ async and are (cancellable) promises e.g.:
 ```
   var myEnumeration = new Accelatrix.Collections.AsyncEnumerable(Accelatrix.Collections.Enumerable.Range(0, 10000000))
                                                 .Select(z => Accelatrix.AsyncChainer.Chain(z, r => r)) // creates promise
-                                                .Select(z => z % 6
+                                                .Select(z => z % 2 == 0
                                                             ? new Bio.Feline(z % 10, 9)
                                                             : new Bio.Mammal(z % 10))
                                                 .OfType(Bio.Mammal)
@@ -417,9 +417,9 @@ Accelatrix.Collections.Enumerable
                       .Skip(2)
                       .Take(10)
                       .AsParallel() // sends everything to threads
-                      .GetAwaiter()
-                      .Then(z => console.log(z))
-                      .Catch(ex => console.error(ex))
+                      .ToList()
+                          .Then(z => console.log(z))
+                          .Catch(ex => console.error(ex))
 ```     
 
 This is a Beta release and .GroupBy() is still not fully supported.
