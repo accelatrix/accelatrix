@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.3.3";
+    const Version = "1.3.5";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1096,6 +1096,8 @@ export declare namespace Accelatrix {
             OfType<TFilter extends T>(typeName: string): IEnumerableOps<TFilter>;
             /** Gets if the sequence contains any elements. */
             Any(): boolean;
+            /** Gets if the sequence doet not contain any elements. */
+            NotAny(): boolean;
             /** Freezes the current enumeration so that the position of the iterator is retained during subsquent calls. */
             Freeze(): IEnumerableOps<T>;
             /** Iterates through the enumeration to product a typed list. */
@@ -1138,6 +1140,8 @@ export declare namespace Accelatrix {
             NotNullOrEmpty(): IEnumerableOps<T>;
             /** If a given element exists within the enumeration. */
             Contains(element: T): boolean;
+            /** If a given element does not exist within the enumeration. */
+            NotContains(element: T): boolean;
             /**
             * Sorts the sequence is ascending order.
             * @param comparer The sorting criteria;
@@ -1274,6 +1278,8 @@ export declare namespace Accelatrix {
             Freeze(): IEnumerableOps<T>;
             /**  Gets if the sequence contains any elements. */
             Any(): boolean;
+            /**  Gets if the sequence does not contain any elements. */
+            NotAny(): boolean;
             /** Commits the enumeration and gets its count. */
             private get length();
             /** Gets the first element, or null, if not present. */
@@ -1336,6 +1342,8 @@ export declare namespace Accelatrix {
             NotNullOrEmpty(): IEnumerableOps<T>;
             /** If a given element exists within the enumeration. */
             Contains(element: T): boolean;
+            /** If a given element does not exist within the enumeration. */
+            NotContains(element: T): boolean;
             /**
             * Sorts the sequence in ascending order.
             * @param comparer The sorting criteria;
@@ -1598,130 +1606,29 @@ export declare namespace Accelatrix {
 
 
 export declare namespace Accelatrix {
-    /** An ongoing promise-like request that can be cancelled, along with the error and result callback. */
-    interface ICancellablePromise<T> extends PromiseLike<T> {
-        /** Cancels an ongoing request by raising an AbortException. */
-        Cancel(): void;
-        /** Attaches a callback to the rejection of the promise. */
-        Catch(onrejected: (exception: Accelatrix.Exception) => void): ICancellablePromise<T>;
-        /** Attaches a callback to the rejection of the promise. */
-        catch(onrejected: (exception: Accelatrix.Exception) => void): ICancellablePromise<T>;
-        /** Attaches callbacks for the resolution and/or rejection of the Promise. */
-        Then(onfulfilled: (value: T) => void): ICancellablePromise<T>;
-        /** An optional callback to invoke once the request is complete. */
-        Finally(callback: () => void): ICancellablePromise<T>;
-    }
-    /** Chains multiple concurrent activities. */
-    class AsyncChainer<T, TException extends Accelatrix.Exception> implements ICancellablePromise<T> {
-        private workStarted;
-        private hasCalledBack;
-        private hasResolved;
-        private hasDeferred;
-        private workload;
-        private callback;
-        private failed;
-        private doneCount;
-        private lastNonNullResult;
-        private accumulatedResult;
-        private finally;
-        private constructor();
-        /**
-         * Queues a work activity for parallel async processing.
-         * @param work The work load to carry out.
-         */
-        static Run<T, TException extends Accelatrix.Exception>(work: () => ICancellablePromise<T>): AsyncChainer<T, Accelatrix.Exception>;
-        /**
-         * Queues a work activity for parallel async processing.
-         * @param work The work load set to carry out.
-         */
-        static Run<T, TException extends Accelatrix.Exception>(work: Array<() => ICancellablePromise<T>>): AsyncChainer<T, Accelatrix.Exception>;
-        /**
-         * Queues a work activity for parallel async processing.
-         * @param work The work load to carry out.
-         */
-        static Run<T, TException extends Accelatrix.Exception>(work: () => T | AsyncChainer<T, TException> | Promise<T> | ICancellablePromise<T> | void): AsyncChainer<T, TException>;
-        /**
-         * Queues a work activity for parallel async processing and yields a map with all the collected results.
-         * @param name The name of the activity.
-         * @param work The work load set to carry out.
-         */
-        static RunToMap<T, TException extends Accelatrix.Exception>(work: {
-            [key: string]: () => T | AsyncChainer<T, TException> | Promise<T> | ICancellablePromise<T> | void;
-        }): AsyncChainer<{
-            [key: string]: T;
-        }, TException>;
-        /**
-         * Returns an empty promise.
-         * @param selfResolving If the promise should automatically self-resolve.
-         */
-        static Empty<T, TException extends Accelatrix.Exception>(selfResolving?: boolean): AsyncChainer<T, TException>;
-        /**
-         * Returns an empty paused promise that will never resolve unless .Resolve() or .Defer() are called.
-         */
-        static Frozen<T, TException extends Accelatrix.Exception>(): AsyncChainer<T, TException>;
-        /**
-         * Queues a work activity for parallel async processing.
-         * @param work The work load to carry out.
-         */
-        Run(work: () => T | AsyncChainer<T, TException> | Promise<T> | ICancellablePromise<T> | void): AsyncChainer<T, TException>;
-        /**
-         * What to call once the workload is completely finished. This will trigger processing.
-         * @param callback The callback to invoke once the workload is completely finished.
-         */
-        Then(callback: (result: T) => void): AsyncChainer<T, TException>;
-        then: any;
-        catch: (callback: (exception: TException) => void) => AsyncChainer<T, TException>;
-        /**
-         * What to call id any work activity has failed.
-         * @param callback The callback to invoke if at least one activity has failed.
-         */
-        Catch(callback: (exception: TException) => void): AsyncChainer<T, TException>;
-        /** Cancels an ongoing execution. */
-        Cancel(): void;
-        /**
-         * Chains the execution of an additional workload whose input is the output of the current.
-         * @param onResult The function that receives the current result and produces a new workload of type ICancelablePromise.
-         */
-        ContinueWith<T, TOut>(onResult: (result: T) => ICancellablePromise<TOut>): AsyncChainer<TOut, TException>;
-        /**
-         * Chains the execution of an additional workload whose input is the output of the current.
-         * @param onResult The function that receives the current result and produces a new workload which is a collection of ICancelablePromise.
-         */
-        ContinueWith<T, TOut>(onResult: (result: T) => Array<ICancellablePromise<TOut>>): AsyncChainer<TOut, TException>;
-        /**
-         * Chains the execution of an additional workload whose input is the output of the current.
-         * @param onResult The function that receives the current result and produces a new workload.
-         */
-        ContinueWith<T, TOut>(onResult: (result: T) => TOut | AsyncChainer<TOut, TException> | Promise<TOut> | ICancellablePromise<TOut> | void): AsyncChainer<TOut, TException>;
-        /**
-         * Pushes a result into the worload resolution resultset.
-         * @param result The result to push into the pipeline.
-         */
-        Resolve(result: T): void;
-        /**
-         * Fails the workload with an exception.
-         * @param exception The exception to fail workload.
-         */
-        Defer(exception: Accelatrix.Exception): void;
-        /**
-         * Sets an optional callback to invoke at the end of the procedure.
-         * @param finallyCallback The callback to invoke at the end.
-         */
-        Finally(finallyCallback: () => void): AsyncChainer<T, TException>;
-        private Work;
-        private UnpackCanceller;
-        private AbortWorkload;
-    }
-    module AsyncChainer {
+    module Async {
+        /** An ongoing promise-like request that can be cancelled, along with the error and result callback. */
+        interface ICancellablePromise<T> extends PromiseLike<T> {
+            /** Cancels an ongoing request by raising an AbortException. */
+            Cancel(): void;
+            /** Attaches a callback to the rejection of the promise. */
+            Catch(onrejected: (exception: Accelatrix.Exception) => void): ICancellablePromise<T>;
+            /** Attaches a callback to the rejection of the promise. */
+            catch(onrejected: (exception: Accelatrix.Exception) => void): ICancellablePromise<T>;
+            /** Attaches callbacks for the resolution and/or rejection of the Promise. */
+            Then(onfulfilled: (value: T) => void): ICancellablePromise<T>;
+            /** An optional callback to invoke once the request is complete. */
+            Finally(callback: () => void): ICancellablePromise<T>;
+        }
         /** A cancellable promise that can be chained. */
-        type IChainablePromise<T> = ICancellablePromise<T> & {
+        interface IChainablePromise<T> extends ICancellablePromise<T> {
             /**
              * Chains a promise with a follow-up action and returns a new promise.
              * @param promise The promise to chain.
              * @param continueWith The follow-up action.
              * @returns Returns a chained promise.
              */
-            ContinueWith<T, TOut>(continueWith: (result: T) => TOut): IChainablePromise<TOut>;
+            ContinueWith<TOut>(continueWith: (result: T) => TOut): IChainablePromise<TOut>;
             /**
              * Chains a promise with a follow-up action and returns a new promise.
              * @param promise The promise to chain.
@@ -1729,24 +1636,41 @@ export declare namespace Accelatrix {
              * @param merge If the newly produced promise should be merged into the original.
              * @returns Returns a chained promise.
              */
-            ContinueWith<T, TOut>(continueWith: (result: T) => ICancellablePromise<TOut>, merge?: boolean): IChainablePromise<TOut>;
-        };
+            ContinueWith<TOut>(continueWith: (result: T) => ICancellablePromise<TOut>, merge?: boolean): IChainablePromise<TOut>;
+        }
         /**
          * Chains a promise with a follow-up action and returns a new promise.
-         * @param promise The promise to chain.
+         * @param promise The promise to chain, or a value T that is to be promised.
          * @param continueWith The follow-up action.
          * @returns Returns a chained promise.
          */
-        export function Chain<T, TOut>(promise: PromiseLike<T>, continueWith: (result: T) => TOut): IChainablePromise<TOut>;
+        function Chain<T, TOut>(promise: PromiseLike<T> | T, continueWith: (result: T) => TOut): IChainablePromise<TOut>;
         /**
          * Chains a promise with a follow-up action and returns a new promise.
-         * @param promise The promise to chain.
+         * @param promise The promise to chain, or a value T that is to be promised.
          * @param continueWith The follow-up action that produces another promise.
          * @param merge If the newly produced promise should be merged into the original.
          * @returns Returns a chained promise.
          */
-        export function Chain<T, TOut>(promise: PromiseLike<T>, continueWith: (result: T) => ICancellablePromise<TOut>, merge?: boolean): IChainablePromise<TOut>;
-        export {};
+        function Chain<T, TOut>(promise: PromiseLike<T> | T, continueWith: (result: T) => ICancellablePromise<TOut>, merge?: boolean): IChainablePromise<TOut>;
+        /**
+         * Wraps any object into a self-resolving Promise that is chainable. As such, .then() should be the last method to reference.
+         * @param obj The objct to wrap.
+         * @returns Returns the self-resolving chainable Promise.
+         */
+        function AsPromise<T>(obj: T): IChainablePromise<T>;
+        /**
+         * Indicates if a given object's instance is a promise.
+         * @param obj Tje object to test.
+         * @returns Returns if the given object's instance is a promise.
+         */
+        function IsPromise(obj: any): boolean;
+        /**
+         * Combines multiple promises into a single promise.
+         * @param promises The promises to combine.
+         * @returns Returns the overarching promise.
+         */
+        function CombineAll<T>(promises: PromiseLike<T>[]): IChainablePromise<Array<T>>;
     }
 }
 
@@ -1836,7 +1760,7 @@ export declare namespace Accelatrix {
             };
         }
         /** A cencellable promise issued by a Task that is being started.. */
-        export interface ITaskPromise<TOut, TIn> extends Accelatrix.ICancellablePromise<TOut> {
+        export interface ITaskPromise<TOut, TIn> extends Accelatrix.Async.ICancellablePromise<TOut> {
             /** Cancels an ongoing request by raising an AbortException. */
             Cancel(): void;
             /** Attaches a callback to the rejection of the promise. */
@@ -2179,13 +2103,17 @@ export declare namespace Accelatrix {
             /** Freezes the current enumeration so that the position of the iterator is retained during subsquent calls. */
             Freeze(): IEnumerableAsyncOps<T>;
             /** Gets if the sequence contains any elements. */
-            Any(): Accelatrix.ICancellablePromise<boolean>;
+            Any(): Accelatrix.Async.IChainablePromise<boolean>;
+            /** Gets if the sequence does not contain any elements. */
+            NotAny(): Accelatrix.Async.IChainablePromise<boolean>;
             /** If a given element exists within the enumeration. */
-            Contains(element: T | PromiseLike<T>): Accelatrix.ICancellablePromise<boolean>;
+            Contains(element: T | PromiseLike<T>): Accelatrix.Async.IChainablePromise<boolean>;
+            /** If a given element does not exist within the enumeration. */
+            NotContains(element: T | PromiseLike<T>): Accelatrix.Async.IChainablePromise<boolean>;
             /** Gets the first element of a sequence, or null if empty, but the order is random and not necessarily the order at input. */
-            FirstOrNull(): Accelatrix.ICancellablePromise<T>;
+            FirstOrNull(): Accelatrix.Async.IChainablePromise<T>;
             /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
-            LastOrNull(): Accelatrix.ICancellablePromise<T>;
+            LastOrNull(): Accelatrix.Async.IChainablePromise<T>;
             /**
             * Creates a HashMap from a sequence according to a specified key selector function. e.g. myPerson.ToDictionary(z => z.Id, w => w).
             * @param keySelector A function to extract the key from each element.
@@ -2193,27 +2121,27 @@ export declare namespace Accelatrix {
             */
             ToDictionary<TKey, TOut>(keySelector: (element: T, index?: number) => TKey, valueSelector: (element: T, index?: number) => TOut): Accelatrix.Collections.IHashMap<TKey, TOut>;
             /** Commits an enumeration as a typed list and gives the count of memebers. */
-            Count(): Accelatrix.ICancellablePromise<number>;
+            Count(): Accelatrix.Async.IChainablePromise<number>;
             /**
             * Sums all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Sum(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.ICancellablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+            Sum(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.Async.IChainablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
             /**
             * Averages all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Average(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.ICancellablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+            Average(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.Async.IChainablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
             /**
             * Max of all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Max(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.ICancellablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+            Max(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.Async.IChainablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
             /**
             * Min of all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Min(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.ICancellablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+            Min(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.Async.IChainablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
             /**
              * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
              * @param typeConstructor The type constructor, e.g. the reference to the class definition.
@@ -2381,7 +2309,7 @@ export declare namespace Accelatrix {
         interface IterableIterator<T> extends Iterator<T> {
         }
         /** A cancellable promise issued by a ParallelQuery's GetAwaiter(). */
-        export interface IParallelQueryPromise<T> extends Accelatrix.ICancellablePromise<T> {
+        export interface IParallelQueryPromise<T> extends Accelatrix.Async.ICancellablePromise<T> {
             /** Allows to subscribe to partial results. */
             OnPartialResult(onPartialResult: (result: T) => void): IParallelQueryPromise<T>;
         }
