@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.3.5";
+    const Version = "1.3.6";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -2160,7 +2160,7 @@ export declare namespace Accelatrix {
              */
             OfType<TFilter extends T>(typeName: string): IEnumerableAsyncOps<TFilter>;
             /** Commits an enumeration as a typed list. */
-            ToList(): IEnumerableAsyncOps<Array<T>>;
+            ToList(): Accelatrix.Async.IChainablePromise<Accelatrix.Collections.IEnumerableOps<T>>;
             /**
             * Concatenates one sequence after the existing.
             *
@@ -2309,7 +2309,7 @@ export declare namespace Accelatrix {
         interface IterableIterator<T> extends Iterator<T> {
         }
         /** A cancellable promise issued by a ParallelQuery's GetAwaiter(). */
-        export interface IParallelQueryPromise<T> extends Accelatrix.Async.ICancellablePromise<T> {
+        export interface IParallelQueryPromise<T> extends Accelatrix.Async.IChainablePromise<T> {
             /** Allows to subscribe to partial results. */
             OnPartialResult(onPartialResult: (result: T) => void): IParallelQueryPromise<T>;
         }
