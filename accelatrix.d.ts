@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.3.6";
+    const Version = "1.3.7";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -2181,7 +2181,7 @@ export declare namespace Accelatrix {
             * Filters a sequence of values based on a predicate.
             * @param selector The selector function.
             */
-            Where(selector: (element: T, index?: number) => boolean | PromiseLike<T>): IEnumerableAsyncOps<T>;
+            Where(selector: (element: T, index?: number) => boolean | PromiseLike<boolean>): IEnumerableAsyncOps<T>;
             /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
             Reverse(): IEnumerableAsyncOps<Array<T>>;
             /** Gets all entries which are not null, and in string enumerations, not empty or white spaces. */
