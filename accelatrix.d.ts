@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.3.7";
+    const Version = "1.4.0";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -2073,14 +2073,14 @@ export declare namespace Accelatrix {
              * @param dataTransform An optional function to transform the data received into the data being pushed into the state, for example, pushing the .GetHashCode() of the data instead of the data itself for faster performance.
              * @param evaluator The function that receives the existing state and the new delta being pushed and produces a follow-up action to be applied to to the original data being pushed before transformation.
              */
-            PushAndEvaluate<TOut>(dataTransform: (data: T) => TOut, evaluator: (accumulatedData: Array<TOut>, newData: TOut) => ((data: T) => any)): StatefulActivity<T>;
+            PushAndEvaluate<TOut>(dataTransform: (data: T) => TOut, evaluator: (accumulatedData: Array<TOut>, newData: TOut, statefulActivityId?: string) => ((data: T) => any)): StatefulActivity<T>;
             /**
              * In a continuous manner, pushes additional state into the StatefulActivity as a buffer and evalutes the state to produce a follow-up action to apply only on the unstransformed state being pushed.
              * @param dataTransform An optional function to transform the data received into the data being pushed into the state, for example, pushing the .GetHashCode() of the data instead of the data itself for faster performance.
              * @param evaluator The function that receives the existing state and the new delta being pushed and produces a follow-up action to be applied to to the original data being pushed before transformation.
              * @param bufferSize How many elements are to be submitted during each push and evaluation cycle.
              */
-            StreamPushAndEvaluate<TOut>(dataTransform: (data: T) => TOut, evaluator: (accumulatedData: Array<TOut>, newData: TOut) => ((data: T) => any), bufferSize?: number): StatefulActivity<T>;
+            StreamPushAndEvaluate<TOut>(dataTransform: (data: T) => TOut, evaluator: (accumulatedData: Array<TOut>, newData: TOut, statefulActivityId?: string) => ((data: T) => any), bufferSize?: number): StatefulActivity<T>;
             /** Frees up any resources consumed by the current StatefulActivity, typically called durinf the .Finally() callback of a CombinedTask. */
             Dispose(): void;
             toJSON(): any;
@@ -2166,7 +2166,7 @@ export declare namespace Accelatrix {
             *
             * @param second The second enumeration.
             */
-            Concat(second: Accelatrix.Collections.IEnumerableOps<T> | IEnumerableAsyncOps<T>): IEnumerableAsyncOps<T>;
+            Concat(second: Accelatrix.Collections.IEnumerableOps<T> | IEnumerableAsyncOps<T> | PromiseLike<Accelatrix.Collections.IEnumerableOps<T> | IEnumerableAsyncOps<T>>): IEnumerableAsyncOps<T>;
             /**
             * Projects each element of a sequence into a new form.
             * @param selector The projection function.

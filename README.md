@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.3.7  
+                                         Accelatrix v1.4.0  
 
                                    (TypeScript and ES5-compliant)
 
@@ -157,7 +157,7 @@ async and are (cancellable) promises e.g.:
 
 ```
   var myEnumeration = new Accelatrix.Collections.AsyncEnumerable(Accelatrix.Collections.Enumerable.Range(0, 10000000))
-                                                .Select(z => Accelatrix.AsyncChainer.Chain(z, r => r)) // creates promise
+                                                .Select(z => Accelatrix.AsyncChainer.AsPromise(z)) // creates self-resolving promise
                                                 .Select(z => z % 2 == 0
                                                             ? new Bio.Feline(z % 10, 9)
                                                             : new Bio.Mammal(z % 10))
@@ -338,7 +338,9 @@ Accelatrix.Tasks.Task.StartNew(data => data.OfType(Bio.Canine).Distinct().ToList
                      .Finally(task => console.log(task));
 
 // Example 3: you can even pass enumerations and have them execute in the Web Worker
-var myData = Accelatrix.Collections.Enumerable.Range(0, 100000).Select(z => new Bio.Feline(z % 3 == 0, 9));  // nothing executed
+var myData = Accelatrix.Collections.Enumerable
+                                   .Range(0, 100000)
+                                   .Select(z => new Bio.Feline(z % 3 == 0, 9));  // nothing executed
 
 Accelatrix.Tasks.Task.StartNew(data => data.Distinct().ToList(), myData)
                      .GetAwaiter()
@@ -403,7 +405,7 @@ Accelatrix.Tasks.CombinedTask.StartNew([
 *****************************************************************************************************************
 
                                      Parallel Enumerations
-                                           (Beta)
+                                             (Beta)
 
 *****************************************************************************************************************
 
@@ -421,5 +423,3 @@ Accelatrix.Collections.Enumerable
                           .Then(z => console.log(z))
                           .Catch(ex => console.error(ex))
 ```     
-
-This is a Beta release and .GroupBy() is still not fully supported.
