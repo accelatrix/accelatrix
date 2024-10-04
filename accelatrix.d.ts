@@ -26,7 +26,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.4.0";
+    const Version = "1.4.1";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1659,6 +1659,13 @@ export declare namespace Accelatrix {
          * @returns Returns the self-resolving chainable Promise.
          */
         function AsPromise<T>(obj: T): IChainablePromise<T>;
+        /**
+         * Wraps any object into a Promise that resolves after a given timeout in milliseconds.
+         * @param obj The objct to wrap.
+         * @param resolveAfter The timeout for the promise to resolve.
+         * @returns Returns the chainable Promise.
+         */
+        function AsPromise<T>(obj: T, resolveAfter: number): IChainablePromise<T>;
         /**
          * Indicates if a given object's instance is a promise.
          * @param obj Tje object to test.

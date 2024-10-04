@@ -1,5 +1,5 @@
 *****************************************************************************************************************
-                                         Accelatrix v1.4.0  
+                                         Accelatrix v1.4.1  
 
                                    (TypeScript and ES5-compliant)
 
@@ -157,10 +157,10 @@ async and are (cancellable) promises e.g.:
 
 ```
   var myEnumeration = new Accelatrix.Collections.AsyncEnumerable(Accelatrix.Collections.Enumerable.Range(0, 10000000))
-                                                .Select(z => Accelatrix.AsyncChainer.AsPromise(z)) // creates self-resolving promise
+                                                .Select(z => Accelatrix.Async.AsPromise(z)) // creates self-resolving promise
                                                 .Select(z => z % 2 == 0
-                                                            ? new Bio.Feline(z % 10, 9)
-                                                            : new Bio.Mammal(z % 10))
+                                                             ? new Bio.Feline(z % 10, 9)
+                                                             : new Bio.Mammal(z % 10))
                                                 .OfType(Bio.Mammal)
                                                 .Where(z => z.NumberOfTits != 1)
                                                 .GroupBy(z => z.NumberOfTits)
@@ -349,7 +349,7 @@ Accelatrix.Tasks.Task.StartNew(data => data.Distinct().ToList(), myData)
                      .Finally(task => console.log(task));
 
 
-// Example 4: Stress load with 100 parallel requests
+// Example 4: Stress-load with 100 parallel requests
 Accelatrix.Collections.Enumerable.Range(0, 100)
                      .ForEach(z =>
                      {
