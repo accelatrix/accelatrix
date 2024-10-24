@@ -1,5 +1,5 @@
 declare global {
-    export interface Object {
+    export interface ITypeSystem {
         /** Gets a close-to-unique fingerprint of the object based on its public members. */
         GetHashCode(): number;
         /**
@@ -15,6 +15,8 @@ declare global {
         /** Culture-aware string representation of the object using the default formatting in Accelatrix.Globalization.DefaultFormatting.*/
         ToString(): string;
     }
+    export interface Object extends ITypeSystem {
+    }
     export interface ObjectConstructor extends Object {
         /**
          * Compares two objects from equatability.
@@ -23,10 +25,12 @@ declare global {
          */
         AreEqual(first: any, second: any): boolean;
     }
+    export interface Boolean extends ITypeSystem {
+    }
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.4.1";
+    const Version = "1.5.0";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -98,7 +102,7 @@ export declare namespace Accelatrix {
 
 
 declare global {
-    export interface String {
+    export interface String extends ITypeSystem {
         /**
         * Replaces accented letters with their accent-free equivalent. Usefull for sorting and other string-based comparison functions.
         */
@@ -615,7 +619,7 @@ export declare namespace Accelatrix {
 
 declare global {
     /** Number definition. */
-    export interface Number {
+    export interface Number extends ITypeSystem {
         /**
          * Adds a number or quantity to the current number and produces a new number instance.
          *
@@ -1630,7 +1634,7 @@ export declare namespace Accelatrix {
              */
             ContinueWith<TOut>(continueWith: (result: T) => TOut): IChainablePromise<TOut>;
             /**
-             * Chains a promise with a follow-up action and returns a new promise.
+             * Chains a promise with a follow-up action and extends the lifecycle of the current promise.
              * @param promise The promise to chain.
              * @param continueWith The follow-up action that produces another promise.
              * @param merge If the newly produced promise should be merged into the original.
@@ -1686,7 +1690,7 @@ export declare namespace Accelatrix {
 
 export declare namespace Accelatrix {
     class Tasks {
-        /** Gets the configuation of the Tasks environment. */
+        /** Gets the configuration of the Tasks environment. */
         static get Config(): Tasks.ITasksConfig;
     }
     /** Parallel execution system using Web Workers. */
@@ -1698,7 +1702,14 @@ export declare namespace Accelatrix {
             /** Plain text JavaScript */
             PlainText = "PlainText"
         }
-        /** The configuation of the Tasks environment. */
+        /** The different methods of passing data to and from Web Workers. */
+        export enum DataPassingMethod {
+            /** Slower, but preserves type information. */
+            TypedSerialization = "TypedSerialization",
+            /** Faster, but data loses the type as a clone is used instead. Explictly add a "$type" property to classes to mitigate this shortcoming. */
+            Clone = "Clone"
+        }
+        /** The configuration of the Tasks environment. */
         export interface ITasksConfig {
             /** Gets the collection of scripts available to the Tasks engine to be presented to its Web Workers. Use .push() to add more. */
             readonly Scripts: {
@@ -1707,6 +1718,8 @@ export declare namespace Accelatrix {
             }[];
             /** Gets or sets the maximum number of active workers at one given moment. */
             MaxParallelism: number;
+            /** How data should be passed to and from Web Workers. */
+            DataPassingMethod: DataPassingMethod;
         }
         /** Represents the current stage in the lifecycle of a Task.  */
         export enum TaskStatus {
@@ -1719,7 +1732,7 @@ export declare namespace Accelatrix {
             /** The task completed execution successfully. */
             RanToCompletion = 3,
             /** The task acknowledged cancellation by throwing a TaskAbortException. */
-            Canceled = 4,
+            Cancelled = 4,
             /** The task completed due to an unhandled exception. */
             Faulted = 5
         }
@@ -1737,9 +1750,9 @@ export declare namespace Accelatrix {
         export interface ITask<T, TOut> {
             /** Enqueues a Task in Created status for execution. */
             Start(): Tasks.ITaskPromise<TOut, T>;
-            /** Gets the current status of the execution. */
+            /** Gets the current status of execution. */
             readonly Status: TaskStatus;
-            /** Gets the resul upon successful completion. */
+            /** Gets the result upon successful completion. */
             readonly Result: TOut;
             /** Gets the exception if the Task has faulted or has been aborted. */
             readonly Exception: Accelatrix.Exception;
@@ -1754,20 +1767,22 @@ export declare namespace Accelatrix {
             readonly IsFaulted: boolean;
             /** Gets if the task is complete. */
             readonly IsCompleted: boolean;
-            /** Gets if the task has been canceled. */
-            readonly IsCanceled: boolean;
+            /** Gets if the task has been Cancelled. */
+            readonly IsCancelled: boolean;
             /** Gets if the task does not contain an action. */
             readonly IsActionless: boolean;
             /** Gets a Promise on which an async caller can await for a result. */
             GetAwaiter(): Tasks.ITaskPromise<TOut, T>;
             /** Gets the set of activities in the task. */
             readonly Activities: {
+                /** The enumeration of activities to carry out sequentially. */
                 Actions: Accelatrix.Collections.IEnumerableOps<TaskActivity<T, TOut>>;
+                /** Input arguments passed to the first activity. */
                 InputArguments: Array<any>;
             };
         }
         /** A cencellable promise issued by a Task that is being started.. */
-        export interface ITaskPromise<TOut, TIn> extends Accelatrix.Async.ICancellablePromise<TOut> {
+        export interface ITaskPromise<TOut, TIn> extends Accelatrix.Async.IChainablePromise<TOut> {
             /** Cancels an ongoing request by raising an AbortException. */
             Cancel(): void;
             /** Attaches a callback to the rejection of the promise. */
@@ -1802,8 +1817,8 @@ export declare namespace Accelatrix {
             get IsFaulted(): boolean;
             /** Gets if the task is complete. */
             get IsCompleted(): boolean;
-            /** Gets if the task has been canceled. */
-            get IsCanceled(): boolean;
+            /** Gets if the task has been Cancelled. */
+            get IsCancelled(): boolean;
             /** Gets if the task does not contain an action. */
             get IsActionless(): boolean;
             /** If the task was created within a task. */
@@ -2058,7 +2073,7 @@ export declare namespace Accelatrix {
             get Id(): string;
             /** Reads the dataset stored in the StatefulActivity. */
             Read(): StatefulActivity<Array<T>>;
-            /** Contacts the current data with the the dataset stored in the StatefulActivity. */
+            /** Concacts the current data with the dataset stored in the StatefulActivity. */
             ConcatRead(): StatefulActivity<Array<T>>;
             /**
              * Reads the dataset stored in the StatefulActivity and pushes an additional set.
@@ -2076,19 +2091,19 @@ export declare namespace Accelatrix {
              */
             Set<TOut>(dataTransform: (data: T) => TOut): StatefulActivity<T>;
             /**
-             * Pushes additional state into the StatefulActivity and evalutes the state to produce a follow-up action to apply only on the unstransformed state being pushed.
+             * Pushes additional state into the StatefulActivity and evaluates the state to produce a follow-up action to apply only on the untransformed state being pushed.
              * @param dataTransform An optional function to transform the data received into the data being pushed into the state, for example, pushing the .GetHashCode() of the data instead of the data itself for faster performance.
-             * @param evaluator The function that receives the existing state and the new delta being pushed and produces a follow-up action to be applied to to the original data being pushed before transformation.
+             * @param evaluator The function that receives the existing state and the new delta being pushed and produces a follow-up action to be applied to the original data being pushed before transformation.
              */
             PushAndEvaluate<TOut>(dataTransform: (data: T) => TOut, evaluator: (accumulatedData: Array<TOut>, newData: TOut, statefulActivityId?: string) => ((data: T) => any)): StatefulActivity<T>;
             /**
-             * In a continuous manner, pushes additional state into the StatefulActivity as a buffer and evalutes the state to produce a follow-up action to apply only on the unstransformed state being pushed.
+             * In a continuous manner, pushes additional state into the StatefulActivity as a buffer and evaluates the state to produce a follow-up action to apply only on the untransformed state being pushed.
              * @param dataTransform An optional function to transform the data received into the data being pushed into the state, for example, pushing the .GetHashCode() of the data instead of the data itself for faster performance.
              * @param evaluator The function that receives the existing state and the new delta being pushed and produces a follow-up action to be applied to to the original data being pushed before transformation.
              * @param bufferSize How many elements are to be submitted during each push and evaluation cycle.
              */
             StreamPushAndEvaluate<TOut>(dataTransform: (data: T) => TOut, evaluator: (accumulatedData: Array<TOut>, newData: TOut, statefulActivityId?: string) => ((data: T) => any), bufferSize?: number): StatefulActivity<T>;
-            /** Frees up any resources consumed by the current StatefulActivity, typically called durinf the .Finally() callback of a CombinedTask. */
+            /** Frees up any resources consumed by the current StatefulActivity, typically called during the .Finally() callback of a CombinedTask. */
             Dispose(): void;
             toJSON(): any;
         }
