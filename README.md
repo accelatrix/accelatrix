@@ -1,7 +1,7 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.5.1 is compatible of ECMAScript 5 and TypeScript.
+> v1.5.1 is compatible with ECMAScript 5 and TypeScript.
 
 If you would like to have a typed C#-like runtime in the browser instead of just at designtime with TypeScript,
 including type introspection, you reached the right place.
