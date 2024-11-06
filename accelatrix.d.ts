@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.5.5";
+    const Version = "1.5.6";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1697,17 +1697,17 @@ export declare namespace Accelatrix {
     namespace Tasks {
         /** The type of source of a script made available to the Tasks engine to be presented to its Web Workers. */
         export enum TaskScriptSource {
-            /** URL of the script (most be hosted by the same site. */
+            /** URL of the script (must be hosted by the same site due to cross-domain constraints). */
             Url = "Url",
             /** Plain text JavaScript */
             PlainText = "PlainText"
         }
-        /** The different methods of passing data to and from Web Workers. */
+        /** The different methods of passing data to and from Web Workers configured in Accelatrix.Tasks.Config.DataPassingMethod. */
         export enum DataPassingMethod {
-            /** Slower, but preserves type information. */
-            TypedSerialization = "TypedSerialization",
             /** Faster, but data loses the type as a clone is used instead. Explictly add a "$type" property to classes to mitigate this shortcoming. */
-            Clone = "Clone"
+            Clone = "Clone",
+            /** Slower, but preserves type information. */
+            TypedSerialization = "TypedSerialization"
         }
         /** The configuration of the Tasks environment. */
         export interface ITasksConfig {
