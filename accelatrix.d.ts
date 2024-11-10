@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.5.6";
+    const Version = "1.5.7";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1104,6 +1104,8 @@ export declare namespace Accelatrix {
             NotAny(): boolean;
             /** Freezes the current enumeration so that the position of the iterator is retained during subsquent calls. */
             Freeze(): IEnumerableOps<T>;
+            /** Wraps the enumeration. */
+            ToEnumerable(): IEnumerableOps<IEnumerableOps<T>>;
             /** Iterates through the enumeration to product a typed list. */
             ToList(): Array<T>;
             /** Commits an enumeration as a typed list and gives the count of memebers. */
@@ -1313,6 +1315,8 @@ export declare namespace Accelatrix {
             OfType<TFilter extends T>(typeConstructorOrType: {
                 new (...args: any[]): TFilter;
             } | Accelatrix.Type | string): IEnumerableOps<TFilter>;
+            /** Wraps the enumeration. */
+            ToEnumerable<T>(): IEnumerableOps<T>;
             /**
             * Projects each element of a sequence into a new form.
             *
@@ -2109,6 +2113,16 @@ export declare namespace Accelatrix {
         }
         export {};
     }
+    namespace Collections {
+        /** Enumerable operations in enumerations. */
+        interface IEnumerableOps<T> extends Accelatrix.Collections.IEnumerableOps<T> {
+            /**
+             * Iterates through each element in the enumeration and executes an action in a separate task.
+             * @param action The action to execute.
+             */
+            ForAll<TOut>(action: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut>;
+        }
+    }
 }
 
 
@@ -2124,6 +2138,8 @@ export declare namespace Accelatrix {
         interface IEnumerableAsyncOps<T> extends Accelatrix.Collections.IEnumerable<T> {
             /** Freezes the current enumeration so that the position of the iterator is retained during subsquent calls. */
             Freeze(): IEnumerableAsyncOps<T>;
+            /** Wraps the enumeration. */
+            ToEnumerable(): IEnumerableAsyncOps<IEnumerableAsyncOps<T>>;
             /** Gets if the sequence contains any elements. */
             Any(): Accelatrix.Async.IChainablePromise<boolean>;
             /** Gets if the sequence does not contain any elements. */
