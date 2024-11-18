@@ -1,7 +1,7 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.5.11 is compatible with ECMAScript 5 and TypeScript.
+> v1.5.12 is compatible with ECMAScript 5 and TypeScript.
 
 If you would like to have a typed C#-like runtime in the browser instead of just at designtime with TypeScript,
 including type introspection, you reached the right place.
@@ -413,11 +413,11 @@ is possible with the .AsParallel() function, e.g.:
 ```js
 Accelatrix.Collections.Enumerable
                       .Range(0, 100)
+                      .AsParallel() // sends everything to threads                      
                       .Select(z => "Item " + z.toString())
                       .Skip(2)
-                      .Take(10)
-                      .AsParallel() // sends everything to threads
+                      .Take(10)                      
                       .ToList()
-                          .Then(z => console.log(z))
                           .Catch(ex => console.error(ex))
+                          .Then(z => console.log(z))                          
 ```     

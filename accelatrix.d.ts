@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.5.11";
+    const Version = "1.5.12";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -157,6 +157,20 @@ declare global {
          * @param arg3 an optional value for the fourth placeholder.
         */
         Format(arg0: any, arg1?: any, arg2?: any, arg3?: any): string;
+        /**
+         * Formats a string by replacing tagged placeholders.
+         * @param arg0 value of the first placeholder.
+         * @param arg1 an optional value for the second placeholder.
+         * @param arg2 an optional value for the third placeholder.
+         * @param arg3 an optional value for the fourth placeholder.
+         * @param arg4 an optional value for the fourth placeholder.
+         * @param arg5 an optional value for the fourth placeholder.
+         * @param arg6 an optional value for the fourth placeholder.
+         * @param arg7 an optional value for the fourth placeholder.
+         * @param arg8 an optional value for the fourth placeholder.
+         * @param arg9 an optional value for the fourth placeholder.
+        */
+        Format(arg0: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any): string;
     }
     export interface StringConstructor extends String {
         /**
