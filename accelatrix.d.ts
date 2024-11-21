@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.6.0";
+    const Version = "1.6.1";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -612,7 +612,6 @@ export declare namespace Accelatrix {
             get BillionsSign(): string;
             /** Gets the abbreviated form for thousands, e.g. B. */
             get MillionsSign(): string;
-            ToString(): string;
             /**
              * Gets the formats associated with a culture code.
              * @param cultureCode The ISo culture code, e.g. en-US, en-GB, pt-PT;

@@ -1,7 +1,7 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.6.0 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
+> v1.6.1 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
 
 If you would like to have a typed C#-like runtime in the browser instead of just at designtime with TypeScript,
 including type introspection, you reached the right place.
@@ -25,7 +25,13 @@ You can then import Accelatrix:
 import Accelatrix from "accelatrix/accelatrix";
 ```
 
-or using the CommonJS syntax:
+Angular users need to unpack the import:
+```js
+import * as AccelatrixFramework from 'accelatrix/accelatrix';
+const Accelatrix: typeof AccelatrixFramework.Accelatrix = <any>AccelatrixFramework;
+```
+
+Or using the CommonJS syntax:
 ```js
 const Accelatrix = require("accelatrix/accelatrix");
 ```
