@@ -27,7 +27,7 @@ import Accelatrix from "accelatrix/accelatrix";
 
 or using the CommonJS syntax:
 ```js
-var accelatrix = require("accelatrix/accelatrix");
+var Accelatrix = require("accelatrix/accelatrix");
 ```
 
 ### Node
