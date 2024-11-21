@@ -1,7 +1,7 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.5.12 is compatible with ECMAScript 5 and TypeScript.
+> v1.6.0 is compatible with ECMAScript 5 and TypeScript.
 
 If you would like to have a typed C#-like runtime in the browser instead of just at designtime with TypeScript,
 including type introspection, you reached the right place.
@@ -19,16 +19,15 @@ You an host the minified file yourself or include the latest version hosted by t
 ```html
 <script src="https://ferreira-family.org/accelatrix/accelatrix.min.js"></script>
 ```
-However, if you wish to carry out parallel operations, you will need to host the file on your web server due to cross-domain constraints.
 
 You can then import Accelatrix:
 ```js
-import Accelatrix from "accelatrix";
+import Accelatrix from "accelatrix/accelatrix";
 ```
 
 or using the CommonJS syntax:
 ```js
-var accelatrix = require("accelatrix");
+var accelatrix = require("accelatrix/accelatrix");
 ```
 
 ### Node
@@ -420,4 +419,6 @@ Accelatrix.Collections.Enumerable
                       .ToList()
                           .Catch(ex => console.error(ex))
                           .Then(z => console.log(z))                          
-```     
+``` 
+
+The location of .AsParallel() in the chain gives you control at which point operations are moved to parallel execution as DOM operations need to remain in the UI thread.
