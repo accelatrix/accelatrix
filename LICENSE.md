@@ -15,10 +15,10 @@ Copyright (c) 2024 Miguel@Ferreira-family.org
 3. Permitted Uses
    a. Academic and Evaluation Use: You may use, copy, modify, and distribute the Software for academic purposes and evaluation without restriction.
    b. Non-Commercial Use: You may use, copy, and distribute the Software for non-commercial purposes.
-   c. Limited Commercial Use: You may use the Software for Commercial Use, provided that such use does not involve a User Login Wall.
+   c. Limited Commercial Use: You may use the Software for Commercial Use, provided that such use does not involve a publicably accessible User Login Wall. Intranet usage is therefore allowed. Please contact the copyright holder to obtain permission to use Accelatrix in a commercial setting involving publicaly accessible User Login Walls.
 
 4. Restrictions
-   a. User Login Wall: Any use of the Software that involves providing access to the Software's functionality behind a User Login Wall requires a separate commercial license from the Copyright Holder.
+   a. User Login Wall: Any use of the Software that involves providing access to the Software's functionality behind a User Login Wall that is publicaly accessible requires a separate commercial license from the Copyright Holder.
    b. Reverse Engineering: You may not reverse engineer, decompile, or disassemble the Software, except to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation.
    c. Extensions and Derivative Works: You may not create extensions or derivative works based on the Software without explicit written permission from the Copyright Holder.
    d. Licensees may NOT use third‐party agents such as commercial reproduction services in furtherance of their own permitted noncommercial uses.

@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.6.1";
+    const Version = "1.6.2";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);

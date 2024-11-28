@@ -1,16 +1,16 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.6.1 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
+> v1.6.2 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
 
 If you would like to have a typed C#-like runtime in the browser instead of just at designtime with TypeScript,
-including type introspection, you reached the right place.
+capable of type introspection, you reached the right place.
 
 If you are a fan of LINQ for Objects and enumerations, you definitely reached the right place.
 
 If you are looking for a low-friction way to tackle multithreading in the browser, this is your ticket in.
 
-Accelatrix is free for non-commercial use or commercial use without a user login wall. Detailed license at https://github.com/accelatrix/accelatrix/blob/main/LICENSE.md
+Accelatrix is free for non-commercial use, evaluation purposes, or commercial use without a user login wall. Detailed license at https://github.com/accelatrix/accelatrix/blob/main/LICENSE.md
 
 
 ## Putting Accelatrix to use
@@ -20,7 +20,7 @@ You can host the minified file yourself or include the latest version hosted by 
 <script src="https://ferreira-family.org/accelatrix/accelatrix.min.js"></script>
 ```
 
-You can then import Accelatrix:
+You can then import Accelatrix in your TS file:
 ```js
 import Accelatrix from "accelatrix/accelatrix";
 ```
@@ -31,7 +31,7 @@ import * as AccelatrixFramework from 'accelatrix/accelatrix';
 const Accelatrix: typeof AccelatrixFramework.Accelatrix = <any>AccelatrixFramework;
 ```
 
-Or using the CommonJS syntax:
+The CommonJS syntax is also supported:
 ```js
 const Accelatrix = require("accelatrix/accelatrix");
 ```
@@ -154,8 +154,7 @@ export namespace Bio
 
 ## Enumerations and Functional Programming
 
-You can now use your favourite LINQ operator functions operating on enumerations, not collections, and arrays are
-now enumerations as well, e.g.:
+You can now use your favourite LINQ operator functions operating on enumerations, not collections, and arrays are now enumerations as well, e.g.:
 
 ```js
   var myEnumeration = Accelatrix.Collections.Enumerable.Range(0, 10000000)
@@ -175,8 +174,7 @@ now enumerations as well, e.g.:
 
 ## Async Enumerations and Functional Programming
 
-You can now use your favourite LINQ operator functions operating on enumerations where members are calculated
-async and are (cancellable) promises e.g.:
+You can now use your favourite LINQ operator functions operating on enumerations where members are calculated async and are (cancellable) promises e.g.:
 
 ```js
   var myEnumeration = new Accelatrix.Collections.AsyncEnumerable(Accelatrix.Collections.Enumerable.Range(0, 10000000))
