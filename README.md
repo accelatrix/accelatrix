@@ -69,7 +69,7 @@ var enums = Bio.TypesOfLocomotion.GetType();                     // Accelatrix.E
 ```
 
 **********************************************
-// sample classes:
+// sample classes in TypeScript:
 
 ```js
 export namespace Bio
@@ -80,7 +80,7 @@ export namespace Bio
         Swim,           
         Walk,           
         Fly,           
-    }           
+    }
 
     abstract class LivingBeing
     {
@@ -154,7 +154,7 @@ export namespace Bio
 
 ## Enumerations and Functional Programming
 
-You can now use your favourite LINQ operator functions operating on enumerations, not collections, and arrays are now enumerations as well, e.g.:
+You can now use your favourite LINQ functions operating on enumerations, not collections, and arrays are now enumerations as well, e.g.:
 
 ```js
   var myEnumeration = Accelatrix.Collections.Enumerable.Range(0, 10000000)
@@ -174,22 +174,23 @@ You can now use your favourite LINQ operator functions operating on enumerations
 
 ## Async Enumerations and Functional Programming
 
-You can now use your favourite LINQ operator functions operating on enumerations where members are calculated async and are (cancellable) promises e.g.:
+You can now use your favourite LINQ functions operating on enumerations where members are calculated async and are (cancellable) promises e.g.:
 
 ```js
   var myEnumeration = new Accelatrix.Collections.AsyncEnumerable(Accelatrix.Collections.Enumerable.Range(0, 10000000))
-                                                .Select(z => Accelatrix.Async.AsPromise(z)) // creates self-resolving promise
+                                                .Select(z => Accelatrix.Async.AsPromise(z)) // creates a self-resolving promise
                                                 .Skip(2)
                                                 .Take(4)
                                             
-  myEnumeration.ToList().then(z => console.log(z));
+  await myEnumeration.ToList();
 
 ```                              
 
 
 ## Typed JSON deserialization 
 
-In order to control the serialization process, the type-centric JSON serializer makes several decorators available:
+The typed JSON deserializer deserializes your JSON response into your own class types instead of plain Object.
+You can also control the serialization process by making use of the following decorators:
 
     - @KnownType
     - @DataMember
@@ -198,9 +199,9 @@ In order to control the serialization process, the type-centric JSON serializer 
     - @OnDeserializing
     - @OnDeserialized
 
-allowing for TypeScript properties to be stringified, but not the underlying members.
+This allows class properties to be stringified, but keep the underlying attributes out.
 
-The deserialization also respects types and deserializes to classes instead of plain object, and can cope with functions as well.
+The deserialization respects [$type] when present and can cope with functions and arrow functions.
 
 
 ```js
@@ -214,7 +215,7 @@ console.log(y.GetType())  // SerializableClass
 
 ```
 
-Even Enumerations with their functions can be serialised and deserialised:
+Even Enumerations with their functions can be serialized and deserialized:
 
 ```js
 var myEnumerable = Accelatrix.Collections.Enumerable
@@ -356,13 +357,14 @@ Accelatrix.Tasks.Task.StartNew(data => data.Distinct().ToList(), myData)
 
 
 // Example 4: Stress-load with 100 parallel requests
-Accelatrix.Collections.Enumerable.Range(0, 100)
-                     .ForEach(z =>
-                     {
+Accelatrix.Collections.Enumerable
+                      .Range(0, 100)
+                      .ForEach(z =>
+                      {
                             Accelatrix.Tasks.Task.StartNew(data => data.Distinct().ToList(), myData)
                                                  .GetAwaiter()
                                                  .Finally(task => console.log("Task: " + z.toString()));
-                     });
+                      });
 
 
 // Example 5: Combine tasks into a single resultset
@@ -371,10 +373,10 @@ Accelatrix.Tasks.CombinedTask.StartNew([
                                             new Accelatrix.Tasks.Task(() => Accelatrix.Collections.Enumerable.Range(20, 20).ToList()),
                                             () => Accelatrix.Collections.Enumerable.Range(40, 20).ToList(),
                                        ])
-                              .GetAwaiter()
-                              .Then(result => console.log(result))
-                              .Catch(ex => console.error(ex))
-                              .Finally(task => console.log(task));                   
+                             .GetAwaiter()
+                             .Then(result => console.log(result))
+                             .Catch(ex => console.error(ex))
+                             .Finally(task => console.log(task));                   
 
 
 // Example 6: Share state between parallel activies (with a cost!)
@@ -433,3 +435,6 @@ await [1, 2, 3, 4, 5, .....].AsParallel() // sends everything to threads
                             .Where(z => z % 2 == 0)
                             .ToList()                     
 ``` 
+
+# Tell us about your experience
+> Please take a minute to [tell us](https://ferreira-family.org/Accelatrix/Questionnaire) about your experience and help make Accelatrix even better.
