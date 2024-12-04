@@ -1,7 +1,7 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.6.2 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
+> v1.6.3 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
 
 If you would like to have a typed C#-like runtime in the browser instead of just at designtime with TypeScript,
 capable of type introspection, you reached the right place.
@@ -424,5 +424,12 @@ Accelatrix.Collections.Enumerable
                           .Catch(ex => console.error(ex))
                           .Then(z => console.log(z))                          
 ``` 
-
 The location of .AsParallel() in the chain gives you control at which point operations are moved to parallel execution as DOM operations need to remain in the UI thread.
+It is also possible to await on the result of a Parallel enumeration, e.g.:
+
+```js
+await [1, 2, 3, 4, 5, .....].AsParallel() // sends everything to threads                      
+                            .Select(z => z * -1)
+                            .Where(z => z % 2 == 0)
+                            .ToList()                     
+``` 
