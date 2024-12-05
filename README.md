@@ -1,7 +1,7 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.6.3 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
+> v1.6.4 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
 
 If you would like to have a typed C#-like runtime in the browser instead of just at designtime with TypeScript,
 capable of type introspection, you reached the right place.

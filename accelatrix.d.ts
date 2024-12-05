@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.6.3";
+    const Version = "1.6.4";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -794,36 +794,36 @@ export declare namespace Accelatrix {
          * @param amount The amount.
          * @param unit The unit or its name.
          */
-        static Generic<TUnit extends IUnit>(amount: number, unit: TUnit | string): any;
+        static Generic<TUnit extends IUnit>(amount: number, unit: TUnit | string): IQuantity<IUnit>;
         /**
          * Creates a new generic immutable quantity.
          * @param amount The amount.
          * @param unit The unit or its name.
          * @param precision The precision to use for display purposes, e.g. null, 0, 1, 10, 100, 1000, ....
          */
-        static Generic<TUnit extends IUnit>(amount: number, unit: TUnit | string, precision: number): any;
+        static Generic<TUnit extends IUnit>(amount: number, unit: TUnit | string, precision: number): IQuantity<IUnit>;
         /**
          * Creates a new immutable percentage.
          * @param amount The amount in full precision which should be between 0 and 1 for 0% - 100%.
          */
-        static Percentage<TUnit extends IUnit>(amount: number): any;
+        static Percentage<TUnit extends IUnit>(amount: number): IQuantity<IUnit>;
         /**
          * Creates a new immutable percentage.
          * @param amount The amount in full precision which should be between 0 and 1 for 0% - 100%.
          * @param precision The precision to use for display purposes, e.g. null, 0, 1, 10, 100, 1000, ....
          */
-        static Percentage<TUnit extends IUnit>(amount: number, precision: number): any;
+        static Percentage<TUnit extends IUnit>(amount: number, precision: number): IQuantity<IUnit>;
         /**
          * Creates a new immutable unitless quantity.
          * @param amount The amount in full precision which should be between 0 and 1 for 0% - 100%.
          */
-        static Unitless<TUnit extends IUnit>(amount: number): any;
+        static Unitless<TUnit extends IUnit>(amount: number): IQuantity<IUnit>;
         /**
          * Creates a new immutable unitless quantity.
          * @param amount The amount in full precision which should be between 0 and 1 for 0% - 100%.
          * @param precision The precision to use for display purposes, e.g. null, 0, 1, 10, 100, 1000, ....
          */
-        static Unitless<TUnit extends IUnit>(amount: number, precision: number): any;
+        static Unitless<TUnit extends IUnit>(amount: number, precision: number): IQuantity<IUnit>;
     }
 }
 
@@ -1246,24 +1246,40 @@ export declare namespace Accelatrix {
             ToDictionary<TKey, TOut extends IEnumerableOps<any>>(keySelector: (element: T, index?: number) => TKey, valueSelector: (element: T, index?: number) => TOut): Accelatrix.Collections.IHashMap<TKey, IEnumerableOps<TOut>>;
             /**
             * Sums all quantitative items in the collection.
-            * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Sum(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
+            Sum<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit>>(): T;
             /**
-            * Averages all quantitative items in the collection.
+            * Sums all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Average(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
+            Sum<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit>>(selector?: (element: T, index?: number) => TOut): TOut;
             /**
-            * Max of all quantitative items in the collection.
-            * @param selector An optional selector to extract only the quantitative elements of the collection.
+            * Min of all quantitative items in the collection.
             */
-            Max(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
+            Average<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
             /**
             * Min of all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Min(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
+            Average<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): TOut;
+            /**
+            * Min of all quantitative items in the collection.
+            */
+            Max<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
+            /**
+            * Min of all quantitative items in the collection.
+            * @param selector An optional selector to extract only the quantitative elements of the collection.
+            */
+            Max<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): TOut;
+            /**
+            * Min of all quantitative items in the collection.
+            */
+            Min<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
+            /**
+            * Min of all quantitative items in the collection.
+            * @param selector An optional selector to extract only the quantitative elements of the collection.
+            */
+            Min<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): TOut;
         }
         interface IteratorResult<T> {
             done: boolean;
@@ -1445,26 +1461,34 @@ export declare namespace Accelatrix {
              * @param valueSelector A function to extract the value from each element.
              */
             ToDictionary<TKey, TOut extends IEnumerableOps<any>>(keySelector: (element: T, index?: number) => TKey, valueSelector: (element: T, index?: number) => TOut): Accelatrix.Collections.HashMap<TKey, IEnumerableOps<TOut>>;
+            /** Sums all quantitative items in the collection. */
+            Sum<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
             /**
             * Sums all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Sum(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
+            Sum<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit>>(selector?: (element: T, index?: number) => TOut): TOut;
+            /** Averages all quantitative items in the collection. */
+            Average<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
             /**
-            * Averages all quantitative items in the collection.
-            * @param selector An optional selector to extract only the quantitative elements of the collection.
-            */
-            Average(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
+             * Averages all quantitative items in the collection.
+             * @param selector An optional selector to extract only the quantitative elements of the collection.
+             */
+            Average<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): TOut;
+            /** Max of all quantitative items in the collection. */
+            Max<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
             /**
-            * Max of all quantitative items in the collection.
-            * @param selector An optional selector to extract only the quantitative elements of the collection.
-            */
-            Max(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
+             * Min of all quantitative items in the collection.
+             * @param selector An optional selector to extract only the quantitative elements of the collection.
+             */
+            Max<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): TOut;
+            /** Min of all quantitative items in the collection. */
+            Min<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
             /**
-            * Min of all quantitative items in the collection.
-            * @param selector An optional selector to extract only the quantitative elements of the collection.
-            */
-            Min(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): number | Accelatrix.IQuantity<Accelatrix.IUnit>;
+             * Min of all quantitative items in the collection.
+             * @param selector An optional selector to extract only the quantitative elements of the collection.
+             */
+            Min<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): TOut;
             /**
             * Creates a sequence of numbers.
             * @param start The first position of the sequence.
@@ -1652,13 +1676,13 @@ export declare namespace Accelatrix {
              */
             ContinueWith<TOut>(continueWith: (result: T) => TOut): IChainablePromise<TOut>;
             /**
-             * Chains a promise with a follow-up action and extends the lifecycle of the current promise.
+             * Chains a promise with a follow-up action and extends the lifecycle of the current promise, thus merging with the continued with promise.
              * @param promise The promise to chain.
              * @param continueWith The follow-up action that produces another promise.
              * @param merge If the newly produced promise should be merged into the original.
              * @returns Returns a chained promise.
              */
-            ContinueWith<TOut>(continueWith: (result: T) => ICancellablePromise<TOut>, merge?: boolean): IChainablePromise<TOut>;
+            ContinueWith<TOut>(continueWith: (result: T) => ICancellablePromise<TOut>, merge: boolean): IChainablePromise<TOut>;
         }
         /**
          * Chains a promise with a follow-up action and returns a new promise.
@@ -1668,13 +1692,13 @@ export declare namespace Accelatrix {
          */
         function Chain<T, TOut>(promise: PromiseLike<T> | T, continueWith: (result: T) => TOut): IChainablePromise<TOut>;
         /**
-         * Chains a promise with a follow-up action and returns a new promise.
+         * Chains a promise with a follow-up action and extends the lifecycle of the current promise, thus merging with the continued with promise.
          * @param promise The promise to chain, or a value T that is to be promised.
          * @param continueWith The follow-up action that produces another promise.
          * @param merge If the newly produced promise should be merged into the original.
          * @returns Returns a chained promise.
          */
-        function Chain<T, TOut>(promise: PromiseLike<T> | T, continueWith: (result: T) => ICancellablePromise<TOut>, merge?: boolean): IChainablePromise<TOut>;
+        function Chain<T, TOut>(promise: PromiseLike<T> | T, continueWith: (result: T) => ICancellablePromise<TOut>, merge: boolean): IChainablePromise<TOut>;
         /**
          * Wraps any object into a self-resolving Promise that is chainable. As such, .then() should be the last method to reference.
          * @param obj The objct to wrap.
@@ -2174,26 +2198,36 @@ export declare namespace Accelatrix {
             ToDictionary<TKey, TOut>(keySelector: (element: T, index?: number) => TKey, valueSelector: (element: T, index?: number) => TOut): Accelatrix.Collections.IHashMap<TKey, TOut>;
             /** Commits an enumeration as a typed list and gives the count of memebers. */
             Count(): Accelatrix.Async.IChainablePromise<number>;
+            /** Sums all quantitative items in the collection. */
+            Sum<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit>>(): Accelatrix.Async.IChainablePromise<T>;
             /**
             * Sums all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Sum(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.Async.IChainablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+            Sum<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit>>(selector?: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut>;
+            /** Averages all quantitative items in the collection. */
+            Average<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): Accelatrix.Async.IChainablePromise<T>;
             /**
             * Averages all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Average(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.Async.IChainablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+            Average<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut>;
+            /** Max of all quantitative items in the collection. */
+            Min<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): Accelatrix.Async.IChainablePromise<T>;
             /**
             * Max of all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Max(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.Async.IChainablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+            Min<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut>;
+            /**
+            * Min of all quantitative items in the collection.
+            */
+            Min<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): Accelatrix.Async.IChainablePromise<T>;
             /**
             * Min of all quantitative items in the collection.
             * @param selector An optional selector to extract only the quantitative elements of the collection.
             */
-            Min(selector?: (element: T, index?: number) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.Async.IChainablePromise<number | Accelatrix.IQuantity<Accelatrix.IUnit>>;
+            Min<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut>;
             /**
              * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
              * @param typeConstructor The type constructor, e.g. the reference to the class definition.
