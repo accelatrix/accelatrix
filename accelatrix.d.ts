@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.6.4";
+    const Version = "1.6.5";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1140,7 +1140,7 @@ export declare namespace Accelatrix {
             */
             Select<TOut>(selector: (element: T, index?: number) => TOut): IEnumerableOps<TOut>;
             /**
-            * Projects each element of a sequence into an sequence and flattens the resulting sequence into one sequence, e.g. myCollection.SelectMany(z => z), or myCollection.SelectMany(z => z.Children).
+            * Projects each element of a sequence into a sequence and flattens the resulting sequence into one sequence, e.g. myCollection.SelectMany(z => z), or myCollection.SelectMany(z => z.Children).
             * @param selector The projection function.
             */
             SelectMany<TOut>(selector: (element: T, index?: number) => IEnumerableOps<TOut>): IEnumerableOps<TOut>;

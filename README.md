@@ -1,10 +1,9 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.6.4 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
+> v1.6.5 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
 
-If you would like to have a typed C#-like runtime in the browser instead of just at designtime with TypeScript,
-capable of type introspection, you reached the right place.
+If you would like to have a typed C#-like runtime in the browser capable of type introspection at runtime instead of just at designtime with TypeScript, you reached the right place.
 
 If you are a fan of LINQ for Objects and enumerations, you definitely reached the right place.
 
@@ -15,9 +14,19 @@ Accelatrix is free for non-commercial use, evaluation purposes, or commercial us
 
 ## Putting Accelatrix to use
 
-You can host the minified file yourself or include the latest version hosted by the author:
+You can host the minified file yourself or simply include the latest version hosted by the author:
 ```html
 <script src="https://ferreira-family.org/accelatrix/accelatrix.min.js"></script>
+```
+
+Or you can install this package as a Node module using:
+```sh
+npm install accelatrix
+```
+
+Or add it to your .Net project using NuGet:
+```sh
+dotnet add package Accelatrix
 ```
 
 You can then import Accelatrix in your TS file:
@@ -34,14 +43,6 @@ const Accelatrix: typeof AccelatrixFramework.Accelatrix = <any>AccelatrixFramewo
 The CommonJS syntax is also supported:
 ```js
 const Accelatrix = require("accelatrix/accelatrix");
-```
-
-### Node
-
-To include Accelatrix in [Node](nodejs.org), first install with npm.
-
-```sh
-npm install accelatrix
 ```
 
 
