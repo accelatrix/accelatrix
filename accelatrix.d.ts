@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.6.5";
+    const Version = "1.6.6";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1234,7 +1234,7 @@ export declare namespace Accelatrix {
             */
             Zip<TSecond, TOut>(second: IEnumerableOps<TSecond>, resultSelector?: (element: T, second: TSecond, index?: number) => TOut): IEnumerableOps<TOut>;
             /**
-            * Interleaves two sequences - creates a single sequence from the elements of two lists arranged in an alternate way.
+            * Interleaves two sequences - creates a single sequence from the elements of two sequences arranged in an alternate way.
             * @param second The second enumeration to interleave with.
             */
             Interleave(second: IEnumerableOps<T>): IEnumerableOps<T>;
@@ -1268,18 +1268,18 @@ export declare namespace Accelatrix {
             Max<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
             /**
             * Min of all quantitative items in the collection.
-            * @param selector An optional selector to extract only the quantitative elements of the collection.
+            * @param selector An optional comparer.
             */
-            Max<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): TOut;
+            Max(comparer?: (a: T, b: T) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): T;
             /**
             * Min of all quantitative items in the collection.
             */
             Min<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
             /**
             * Min of all quantitative items in the collection.
-            * @param selector An optional selector to extract only the quantitative elements of the collection.
+            * @param comparer An optional comparer.
             */
-            Min<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): TOut;
+            Min(comparer?: (a: T, b: T) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): T;
         }
         interface IteratorResult<T> {
             done: boolean;
@@ -1478,17 +1478,17 @@ export declare namespace Accelatrix {
             /** Max of all quantitative items in the collection. */
             Max<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
             /**
-             * Min of all quantitative items in the collection.
-             * @param selector An optional selector to extract only the quantitative elements of the collection.
+             * Max of all quantitative items in the collection.
+             * @param comparer An optional comparer.
              */
-            Max<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): TOut;
+            Max(comparer?: (a: T, b: T) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): T;
             /** Min of all quantitative items in the collection. */
             Min<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): T;
             /**
              * Min of all quantitative items in the collection.
-             * @param selector An optional selector to extract only the quantitative elements of the collection.
+             * @param comparer An optional comparer.
              */
-            Min<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): TOut;
+            Min(comparer?: (a: T, b: T) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): T;
             /**
             * Creates a sequence of numbers.
             * @param start The first position of the sequence.
@@ -1695,19 +1695,19 @@ export declare namespace Accelatrix {
          * Chains a promise with a follow-up action and extends the lifecycle of the current promise, thus merging with the continued with promise.
          * @param promise The promise to chain, or a value T that is to be promised.
          * @param continueWith The follow-up action that produces another promise.
-         * @param merge If the newly produced promise should be merged into the original.
+         * @param merge If the newly produced promise should be merged with the original, thus extending the lifecycle of the original herein returned.
          * @returns Returns a chained promise.
          */
         function Chain<T, TOut>(promise: PromiseLike<T> | T, continueWith: (result: T) => ICancellablePromise<TOut>, merge: boolean): IChainablePromise<TOut>;
         /**
-         * Wraps any object into a self-resolving Promise that is chainable. As such, .then() should be the last method to reference.
-         * @param obj The objct to wrap.
+         * Wraps any object into a self-resolving Promise that is chainable. As such, .then() should be the last method to reference and .catch() should be first.
+         * @param obj The object to wrap.
          * @returns Returns the self-resolving chainable Promise.
          */
         function AsPromise<T>(obj: T): IChainablePromise<T>;
         /**
          * Wraps any object into a Promise that resolves after a given timeout in milliseconds.
-         * @param obj The objct to wrap.
+         * @param obj The object to wrap.
          * @param resolveAfter The timeout for the promise to resolve.
          * @returns Returns the chainable Promise.
          */
@@ -2213,21 +2213,21 @@ export declare namespace Accelatrix {
             */
             Average<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut>;
             /** Max of all quantitative items in the collection. */
-            Min<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): Accelatrix.Async.IChainablePromise<T>;
+            Max<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): Accelatrix.Async.IChainablePromise<T>;
             /**
             * Max of all quantitative items in the collection.
-            * @param selector An optional selector to extract only the quantitative elements of the collection.
+            * @param comparer An optional comparer.
             */
-            Min<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut>;
+            Max(comparer?: (a: T, b: T) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.Async.IChainablePromise<T>;
             /**
             * Min of all quantitative items in the collection.
             */
             Min<TMember extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(): Accelatrix.Async.IChainablePromise<T>;
             /**
             * Min of all quantitative items in the collection.
-            * @param selector An optional selector to extract only the quantitative elements of the collection.
+            * @param comparer An optional comparer.
             */
-            Min<TOut extends number | Accelatrix.IQuantity<Accelatrix.IUnit> | Date>(selector?: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut>;
+            Min(comparer?: (a: T, b: T) => number | Accelatrix.IQuantity<Accelatrix.IUnit>): Accelatrix.Async.IChainablePromise<T>;
             /**
              * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
              * @param typeConstructor The type constructor, e.g. the reference to the class definition.
