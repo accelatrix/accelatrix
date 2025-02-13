@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.6.7";
+    const Version = "1.6.8";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1736,7 +1736,7 @@ export declare namespace Accelatrix {
         static get Config(): Tasks.ITasksConfig;
     }
     /** Parallel execution system using Web Workers. */
-    namespace Tasks {
+    module Tasks {
         /** The type of source of a script made available to the Tasks engine to be presented to its Web Workers. */
         export enum TaskScriptSource {
             /** URL of the script (must be hosted by the same site due to cross-domain constraints). */

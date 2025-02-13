@@ -1,7 +1,7 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.6.7 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
+> v1.6.8 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
 
 If you would like to have a typed C#-like runtime in the browser capable of type introspection at runtime instead of just at designtime with TypeScript, you reached the right place.
 
@@ -37,6 +37,23 @@ import Accelatrix from "accelatrix/accelatrix";
 The CommonJS syntax is also supported:
 ```js
 const Accelatrix = require("accelatrix/accelatrix");
+```
+
+If you are using Vite as your package manager, tell it not to attempt to rename symbols in your vite.config.js file, e.g.:
+```js
+import { defineConfig } from 'vite';
+import angular from 'vite-plugin-angular';
+
+export default defineConfig({
+  plugins: [angular()],
+  build: {
+    minify: 'esbuild',
+    esbuild: {
+      legalComments: 'none',
+      preserveSymbols: true,
+    },
+  },
+});
 ```
 
 
