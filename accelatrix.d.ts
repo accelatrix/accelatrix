@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.6.9";
+    const Version = "1.6.10";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -2352,7 +2352,7 @@ export declare namespace Accelatrix {
         }
         /** An enumeration that can cope with async members. */
         const AsyncEnumerable: {
-            new <T>(arg: Accelatrix.Collections.IEnumerableOps<T | PromiseLike<T>> | IEnumerableAsyncOps<T> | (() => IterableIterator<T | Promise<T>>)): Accelatrix.Collections.Enumerable<T> & IEnumerableAsyncOps<T>;
+            new <T>(arg: Accelatrix.Collections.IEnumerableOps<T | PromiseLike<T>> | IEnumerableAsyncOps<T> | (() => IterableIterator<T | Promise<T>>)): IEnumerableAsyncOps<T> & Accelatrix.Collections.Enumerable<T>;
         };
     }
 }
