@@ -1,7 +1,7 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.6.10 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
+> v1.6.11 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
 
 If you would like to have a typed C#-like runtime in the browser capable of type introspection at runtime instead of just at designtime with TypeScript, you reached the right place.
 
@@ -160,6 +160,43 @@ export namespace Bio
             return this.numberOfLives;
         }
     }
+
+    export class Canine extends Mammal
+    {
+        private readonly numberOfTeeth: number;
+
+        public constructor(numberOfTits: number, numberOfTeeth: number)
+        {
+            super(numberOfTits);
+
+            if (numberOfTeeth == null)
+                throw new self["Accelatrix"].ArgumentNullException("numberOfTeeth");
+
+            this.numberOfTeeth = numberOfTeeth;
+            this.Locomotion = TypesOfLocomotion.Walk;
+        }
+
+        public get NumberOfTeeth(): number
+        {
+            return this.numberOfTeeth;
+        }
+
+        public static Wolf =  class Wolf extends Canine
+                               {
+                                   constructor()
+                                   {
+                                        super(8, 42);
+                                   }
+                               }
+
+        public static Dog =  class Dog extends Canine
+                               {
+                                   constructor()
+                                   {
+                                        super(8, 42);
+                                   }
+                               }
+    }        
 }
 ```
 
@@ -350,7 +387,7 @@ cancellablePromise.Then(result => console.log(result))
 // Example 2
 var myData = [ new Bio.Canine.Dog(), new Bio.Canine.Wolf(), new Bio.Feline(8, 9) ]
 
-Accelatrix.Tasks.Task.StartNew(data => data.OfType(Bio.Canine).Distinct().ToList(), myData)
+Accelatrix.Tasks.Task.StartNew(data => data.Where(z => z.NumberOfLives == null).Distinct().ToList(), myData)
                      .GetAwaiter()
                      .Then(result => console.log(result))
                      .Catch(ex => console.error(ex))
@@ -359,7 +396,7 @@ Accelatrix.Tasks.Task.StartNew(data => data.OfType(Bio.Canine).Distinct().ToList
 // Example 3: you can even pass enumerations and have them execute in the Web Worker
 var myData = Accelatrix.Collections.Enumerable
                                    .Range(0, 100000)
-                                   .Select(z => new Bio.Feline(z % 3 == 0, 9));  // nothing executed
+                                   .Select(z => new Bio.Feline(z % 3 == 0 ? 8 : 6, 9));  // nothing executed
 
 Accelatrix.Tasks.Task.StartNew(data => data.Distinct().ToList(), myData)
                      .GetAwaiter()
@@ -393,7 +430,7 @@ Accelatrix.Tasks.CombinedTask.StartNew([
 
 // Example 6: Share state between parallel activies (with a cost!)
 // This example will produce a single result from the task that runs first
-var shared = Accelatrix.Tasks.StatefulActivity();
+var shared = new Accelatrix.Tasks.StatefulActivity<number[]>();
 
 Accelatrix.Tasks.CombinedTask.StartNew([
 					   new Accelatrix.Tasks.ActivitySet([

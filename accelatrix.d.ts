@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.6.10";
+    const Version = "1.6.11";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -276,6 +276,19 @@ export declare namespace Accelatrix {
          * @param constructorArgs The arguments to pass to the constructor, either as an ordered collection, or as a named collection.
          */
         CreateNewInstance(constructorArgs: Array<any> | object): object;
+        /**
+         * Creates a new instance of a type based on its name.
+         * @param typeName The name of the type.
+         * @returns Returns an object of the specified type.
+         */
+        static CreateNewInstance(typeName: string): object;
+        /**
+         * Creates a new instance of a type based on its name.
+         * @param typeName The name of the type.
+         * @param constructorArgs The arguments to pass to the constructor, either as an ordered collection, or as a named collection.
+         * @returns Returns an object of the specified type.
+         */
+        static CreateNewInstance(typeName: string, constructorArgs: Array<any> | object): object;
         /**
          * Indicates if the specified type is the same or a parent from the current type.
          * @param type The type to compare or its name.
@@ -1787,7 +1800,7 @@ export declare namespace Accelatrix {
             constructor(message?: string);
         }
         /** An activity in a task. */
-        export type TaskActivity<T, TOut> = ((...args: any[]) => TOut | ITask<T, TOut>) | ITask<T, TOut>;
+        export type TaskActivity<T, TOut> = StatefulActivity<T> | ((...args: any[]) => TOut | ITask<T, TOut>) | ITask<T, TOut>;
         /** Represents a generic Task. */
         export interface ITask<T, TOut> {
             /** Enqueues a Task in Created status for execution. */
@@ -2035,13 +2048,13 @@ export declare namespace Accelatrix {
              * Creates a new CombinedTask instance.
              * @param actions An enumeration of functions or Tasks that are to be executed parallely to contribute to a combined result.
              */
-            constructor(actions: Array<TaskActivity<T, TOut>>);
+            constructor(actions: Array<TaskActivity<T, any>>);
             /**
              * Creates a new CombinedTask instance.
              * @param actions An enumeration of functions or Tasks that are to be executed parallely to contribute to a combined result.
              * @param inputArguments An optional set of initial input arguments to pass onto the each member.
              */
-            constructor(actions: Array<TaskActivity<T, TOut>>, inputArguments: {
+            constructor(actions: Array<TaskActivity<T, any>>, inputArguments: {
                 0: T;
                 [key: number]: any;
             });
@@ -2055,20 +2068,20 @@ export declare namespace Accelatrix {
             * The Tasks.Config.Scripts static property must have been set once in the session.
             * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
             */
-            static StartNew<T, TOut extends Array<TOut>>(actions: Array<TaskActivity<T, TOut>>): CombinedTask<T, TOut>;
+            static StartNew<T, TOut extends Array<TActivities>, TActivities extends TOut>(actions: Array<TaskActivity<T, TActivities>>): CombinedTask<T, TOut>;
             /**
             * Creates and immediatelly starts a new CombinedTask executed parallely in separate threads.
             * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
             * @param arg0 An argument to be passed.
             */
-            static StartNew<T, TOut extends Array<TOut>>(actions: Array<TaskActivity<T, TOut>>, arg0: T): CombinedTask<T, TOut>;
+            static StartNew<T, TOut extends Array<TActivities>, TActivities extends TOut>(actions: Array<TaskActivity<T, TActivities>>, arg0: T): CombinedTask<T, TOut>;
             /**
             * Creates and immediatelly starts a new CombinedTask executed parallely in separate threads.
             * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
             * @param arg0 An argument to be passed.
             * @param arg1 A second argument to be passed.
             */
-            static StartNew<T, TOut extends Array<TOut>>(actions: Array<TaskActivity<T, TOut>>, arg0: T, arg1: any): CombinedTask<T, TOut>;
+            static StartNew<T, TOut extends Array<TActivities>, TActivities extends TOut>(actions: Array<TaskActivity<T, TActivities>>, arg0: T, arg1: any): CombinedTask<T, TOut>;
             /**
             * Creates and immediatelly starts a new CombinedTask executed parallely in separate threads.
             * @param actions The set of functions or tasks to execute and produce a result of T or a subtask of T.
@@ -2076,7 +2089,7 @@ export declare namespace Accelatrix {
             * @param arg1 A second argument to be passed.
             * @param arg2 A third argument to be passed.
             */
-            static StartNew<T, TOut extends Array<TOut>>(actions: Array<TaskActivity<T, TOut>>, arg0: T, arg1: any, arg2: any): CombinedTask<T, TOut>;
+            static StartNew<T, TOut extends Array<TActivities>, TActivities extends TOut>(actions: Array<TaskActivity<T, TActivities>>, arg0: T, arg1: any, arg2: any): CombinedTask<T, TOut>;
         }
         /**
          * An activity that can maintain state between concurrent tasks.
