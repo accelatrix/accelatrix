@@ -1,7 +1,7 @@
 # Accelatrix
 
 > A parallel functional programming framework for in-browser processing of enumerations of business entities.
-> v1.6.11 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
+> v1.6.13 is compatible with ECMAScript 5, ES6, TypeScript, React, Angular and Vue.
 
 If you would like to have a typed C#-like runtime in the browser capable of type introspection at runtime instead of just at designtime with TypeScript, you reached the right place.
 
@@ -54,6 +54,32 @@ export default defineConfig({
     },
   },
 });
+```
+
+If you are compiling to ES5, make sure to make the compiler aware of the ES6 library in your ts.config file, e.g.:
+```json
+{
+    "compilerOptions":
+    {
+        "target": "es5",
+        "module": "es6",
+        "moduleResolution": "classic",
+        "typeRoots": ["node_modules/@types"],
+        "lib": ["es5", "es6", "dom"],
+    },
+    "exclude": ["node_modules", "typings/browser", "typings/browser.d.ts"],
+}
+```
+
+If you are using Visual Studio and compiling to ES5, change your .csproj to include ES6 types, e.g.:
+```xml
+<PropertyGroup>
+  <!-- compile target -->
+  <TypeScriptTarget>ES5</TypeScriptTarget>
+
+  <!-- comma-separated list of libs -->
+  <TypeScriptLib>es5,es6,dom</TypeScriptLib>
+</PropertyGroup>
 ```
 
 

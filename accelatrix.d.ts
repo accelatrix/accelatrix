@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.6.11";
+    const Version = "1.6.13";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1069,6 +1069,7 @@ export {};
 
 
 
+
 declare global {
     /** Array as IEnumerable. */
     export interface Array<T> extends Accelatrix.Collections.IEnumerableOps<T> {
@@ -1350,6 +1351,11 @@ export declare namespace Accelatrix {
              * @param action The action to execute. The cycle is halted if the action returns a boolean false.
              */
             ForEach(action: (element: T, index?: number) => boolean | void | any): void;
+            /**
+             * Iterates through each element in the enumeration and executes an action in a separate task.
+             * @param action The action to execute.
+             */
+            ForAll<TOut>(action: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut[]>;
             /**
              * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
              * @param typeConstructorOrType The type constructor, e.g. the reference to the class, or the Accelatrix.Type of the type to filter.
@@ -2166,12 +2172,12 @@ export declare namespace Accelatrix {
     }
     namespace Collections {
         /** Enumerable operations in enumerations. */
-        interface IEnumerableOps<T> extends Accelatrix.Collections.IEnumerableOps<T> {
+        interface IEnumerableOps<T> {
             /**
              * Iterates through each element in the enumeration and executes an action in a separate task.
              * @param action The action to execute.
              */
-            ForAll<TOut>(action: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut>;
+            ForAll<TOut>(action: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut[]>;
         }
     }
 }
