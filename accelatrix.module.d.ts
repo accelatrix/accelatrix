@@ -1,4 +1,5 @@
-    interface ITypeSystem {
+declare global {
+    export interface ITypeSystem {
         /** Gets a close-to-unique fingerprint of the object based on its public members. */
         GetHashCode(): number;
         /**
@@ -14,9 +15,9 @@
         /** Culture-aware string representation of the object using the default formatting in Accelatrix.Globalization.DefaultFormatting.*/
         ToString(): string;
     }
-    interface Object extends ITypeSystem {
+    export interface Object extends ITypeSystem {
     }
-    interface ObjectConstructor extends Object {
+    export interface ObjectConstructor extends Object {
         /**
          * Compares two objects from equatability.
          * @param first The first object to compare.
@@ -24,10 +25,11 @@
          */
         AreEqual(first: any, second: any): boolean;
     }
-    interface Boolean extends ITypeSystem {
+    export interface Boolean extends ITypeSystem {
     }
+}
 /** Accelatrix namespace. */
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     const Version = "1.7.0";
     /** A base exception. */
     class Exception extends Error {
@@ -99,7 +101,8 @@ declare namespace Accelatrix {
 }
 
 
-    interface String extends ITypeSystem {
+declare global {
+    export interface String extends ITypeSystem {
         /**
         * Replaces accented letters with their accent-free equivalent. Usefull for sorting and other string-based comparison functions.
         */
@@ -169,23 +172,26 @@ declare namespace Accelatrix {
         */
         Format(arg0: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, arg6?: any, arg7?: any, arg8?: any, arg9?: any): string;
     }
-    interface StringConstructor extends String {
+    export interface StringConstructor extends String {
         /**
         * If a string is null or empty or is comprised of just white spaces.
         * @param text The string to probe.
         */
         IsNullOrWhiteSpace(text: string): boolean;
     }
+}
+export {};
 
 
 
-
-    interface Object {
+declare global {
+    export interface Object {
         /** Gets the type of object, e.g. "String", "Date", "Boolean".*/
         GetType(): Accelatrix.Type;
     }
+}
 /** Accelatrix namespace. */
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     /** The generic representation of a type.*/
     abstract class Type {
         /**
@@ -403,7 +409,8 @@ declare namespace Accelatrix {
 
 
 
-    interface Object {
+declare global {
+    export interface Object {
         /** Culture-aware string representation of the object using the default formatting in Accelatrix.Globalization.DefaultFormatting.*/
         ToString(): string;
         /**
@@ -412,8 +419,9 @@ declare namespace Accelatrix {
          */
         ToString(formatting: Accelatrix.Globalization.ILocaleFormatInfo): string;
     }
+}
 /** Accelatrix namespace. */
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     /** Deals with localization. */
     class Globalization {
         /** Gets or sets the default formatting applied during .ToString() operations if an ILocaleFormatInfo is not provided. */
@@ -635,8 +643,9 @@ declare namespace Accelatrix {
 
 
 
+declare global {
     /** Number definition. */
-    interface Number extends ITypeSystem {
+    export interface Number extends ITypeSystem {
         /**
          * Adds a number or quantity to the current number and produces a new number instance.
          *
@@ -673,7 +682,7 @@ declare namespace Accelatrix {
         Parse(number: string): number;
     }
     /** Number definition. */
-    interface NumberConstructor extends Number {
+    export interface NumberConstructor extends Number {
         /**
          * Culture-aware parsing of number.
          * @param number  The culture-sensitive string to parse into a number.
@@ -711,8 +720,9 @@ declare namespace Accelatrix {
         /** Gets the abbreviated form for thousands, e.g. B. */
         readonly BillionsSign: string;
     }
+}
 /** Accelatrix namespace. */
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     /** Represents a unit of an IQuantity. */
     interface IUnit {
         /** The code of the unit, e.g. EUR. */
@@ -833,7 +843,8 @@ declare namespace Accelatrix {
 
 
 
-    interface Date {
+declare global {
+    export interface Date {
         /** Produces a culture-aware long date string according to the default ILocaleFormatInfo in Accelatrix.Globalization.DefaultFormatting.*/
         ToDateTimeString(): string;
         /**
@@ -946,7 +957,7 @@ declare namespace Accelatrix {
     /**
     * The date base type.
     */
-    interface DateConstructor extends Date {
+    export interface DateConstructor extends Date {
         /**
          * Parses a culture-sensitive string back into a date object according to the default ILocaleFormatInfo in Accelatrix.Globalization.DefaultFormatting.
          * @param date The culture-sensitive string to parse.
@@ -984,16 +995,18 @@ declare namespace Accelatrix {
         /** Gets the current moment in time. */
         readonly Now: Date;
     }
-    interface ObjectConstructor extends Object {
+    export interface ObjectConstructor extends Object {
         /**
          * Unboxes ISO serialized dates into date objects in a recursive manner.
          * @param obj The object for which serialized dates are to be unboxed.
          */
         UnboxDates(obj: object): void;
     }
+}
 
 
-    interface Uint8Array {
+declare global {
+    export interface Uint8Array {
         /** Convert a byte array into a base64 string. */
         ToBase64(): string;
         /** Creates a string from UTF8 byte array. */
@@ -1010,7 +1023,7 @@ declare namespace Accelatrix {
             };
         };
     }
-    interface ArrayBuffer {
+    export interface ArrayBuffer {
         /** Convert a byte array into a base64 string. */
         ToBase64(): string;
         /** Creates a string from UTF8 byte array. */
@@ -1018,14 +1031,14 @@ declare namespace Accelatrix {
         /** Creates an hexdecimal string from the byte array. */
         ToHexString: () => string;
     }
-    interface Uint8ArrayConstructor extends Uint8Array {
+    export interface Uint8ArrayConstructor extends Uint8Array {
         /**
          * Converts a Base64 string into a byte array.
          * @param base64String The Base54-encoded string.
          */
         FromBase64(base64String: string): Uint8Array;
     }
-    interface String {
+    export interface String {
         /** Converts string to ANSII Byte Array. */
         ToAnsii: () => Uint8Array;
         /** Converts string to UTF8 Byte Array. */
@@ -1040,13 +1053,15 @@ declare namespace Accelatrix {
             };
         };
     }
-    interface StringConstructor extends String {
+    export interface StringConstructor extends String {
         /**
          * Convets UTF8 bytes back into a string.
          * @param bytes The byte array to read from.
          */
         FromBytes(bytes: Uint8Array): string;
     }
+}
+export {};
 
 
 
@@ -1055,11 +1070,11 @@ declare namespace Accelatrix {
 
 
 
-
+declare global {
     /** Array as IEnumerable. */
-    interface Array<T> extends Accelatrix.Collections.IEnumerableOps<T> {
+    export interface Array<T> extends Accelatrix.Collections.IEnumerableOps<T> {
     }
-    interface ObjectConstructor extends Object {
+    export interface ObjectConstructor extends Object {
         /**
         * Flattens a hierarchy contained within an object into a single sequence, e.g. myHierarchy.FlattenHierarchy(z => z.Children).
         * @param obj The root object to flatten.
@@ -1067,11 +1082,12 @@ declare namespace Accelatrix {
         */
         FlattenHierarchy<T>(obj: Object, childEnumerator: (item: T) => Accelatrix.Collections.IEnumerableOps<T>): Accelatrix.Collections.IEnumerableOps<T>;
     }
+}
 /** Accelatrix namespace. */
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     namespace Collections {
         /** Supports a simple iteration over an enumeration of a specified type. */
-        interface IEnumerator<T> {
+        export interface IEnumerator<T> {
             /** Gets the element in the enumeration at the current position. */
             readonly Current: T;
             /** Advances the enumerator to the next element of the enumeration and indicates if the operation was successful. */
@@ -1082,16 +1098,16 @@ declare namespace Accelatrix {
         /**
         * A generic typed enumeration.
         */
-        interface IEnumerable<T> {
+        export interface IEnumerable<T> {
             /** Gets the enumerator to iterate through the enumeration. */
             GetEnumerator(): IEnumerator<T>;
         }
         /** A grouped enumeration.  */
-        interface IGrouping<TKey, T> extends IEnumerableOps<T> {
+        export interface IGrouping<TKey, T> extends IEnumerableOps<T> {
             Key: TKey;
         }
         /** Enumerable operations in enumerations. */
-        interface IEnumerableOps<T> extends IEnumerable<T> {
+        export interface IEnumerableOps<T> extends IEnumerable<T> {
             /**
              * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
              * @param typeConstructor The type constructor, e.g. the reference to the class definition.
@@ -1499,7 +1515,7 @@ declare namespace Accelatrix {
             */
             static Range(start: number, count?: number): IEnumerableOps<number>;
         }
-        
+        export {};
     }
 }
 
@@ -1508,7 +1524,7 @@ declare namespace Accelatrix {
 
 
 
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     /** Collectipns namespace. */
     namespace Collections {
         /** A dictionary where the key is of any type. */
@@ -1581,7 +1597,7 @@ declare namespace Accelatrix {
 
 
 
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     /** Deals with JSON serialization. */
     namespace Serialization {
         /**
@@ -1654,7 +1670,7 @@ declare namespace Accelatrix {
 
 
 
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     module Async {
         /** An ongoing promise-like request that can be cancelled, along with the error and result callback. */
         interface ICancellablePromise<T> extends PromiseLike<T> {
@@ -1733,7 +1749,7 @@ declare namespace Accelatrix {
 
 
 
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     class Tasks {
         /** Gets the configuration of the Tasks environment. */
         static get Config(): Tasks.ITasksConfig;
@@ -1755,7 +1771,7 @@ declare namespace Accelatrix {
             TypedSerialization = "TypedSerialization"
         }
         /** The configuration of the Tasks environment. */
-        interface ITasksConfig {
+        export interface ITasksConfig {
             /** Gets the collection of scripts available to the Tasks engine to be presented to its Web Workers. Use .push() to add more. */
             readonly Scripts: {
                 SourceType: Tasks.TaskScriptSource;
@@ -1792,7 +1808,7 @@ declare namespace Accelatrix {
         /** An activity in a task. */
         export type TaskActivity<T, TOut> = StatefulActivity<T> | ((...args: any[]) => TOut | ITask<T, TOut>) | ITask<T, TOut>;
         /** Represents a generic Task. */
-        interface ITask<T, TOut> {
+        export interface ITask<T, TOut> {
             /** Enqueues a Task in Created status for execution. */
             Start(): Tasks.ITaskPromise<TOut, T>;
             /** Gets the current status of execution. */
@@ -1827,7 +1843,7 @@ declare namespace Accelatrix {
             };
         }
         /** A cencellable promise issued by a Task that is being started.. */
-        interface ITaskPromise<TOut, TIn> extends Accelatrix.Async.IChainablePromise<TOut> {
+        export interface ITaskPromise<TOut, TIn> extends Accelatrix.Async.IChainablePromise<TOut> {
             /** Cancels an ongoing request by raising an AbortException. */
             Cancel(): void;
             /** Attaches a callback to the rejection of the promise. */
@@ -2152,7 +2168,7 @@ declare namespace Accelatrix {
             Dispose(): void;
             toJSON(): any;
         }
-        
+        export {};
     }
     namespace Collections {
         /** Enumerable operations in enumerations. */
@@ -2173,7 +2189,7 @@ declare namespace Accelatrix {
 
 
 
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     namespace Collections {
         /** An enumeration that runs in parallel. */
         interface IEnumerableAsyncOps<T> extends Accelatrix.Collections.IEnumerable<T> {
@@ -2365,14 +2381,16 @@ declare namespace Accelatrix {
 
 
 
-    interface Array<T> {
+declare global {
+    export interface Array<T> {
         /**
         * Creates a new enumeration that is handled in Web Workers.
         * The Tasks.Config.Scripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
         */
         AsParallel: () => Accelatrix.Collections.IEnumerableAsyncOps<T>;
     }
-declare namespace Accelatrix {
+}
+export declare namespace Accelatrix {
     /** Operations for enumerations. */
     interface IEnumerable<T> {
         /**
@@ -2382,7 +2400,7 @@ declare namespace Accelatrix {
         AsParallel: () => Accelatrix.Collections.IEnumerableAsyncOps<T>;
     }
 }
-declare namespace Accelatrix {
+export declare namespace Accelatrix {
     namespace Collections {
         interface IteratorResult<T> {
             done: boolean;
@@ -2396,7 +2414,7 @@ declare namespace Accelatrix {
         interface IterableIterator<T> extends Iterator<T> {
         }
         /** A cancellable promise issued by a ParallelQuery's GetAwaiter(). */
-        interface IParallelQueryPromise<T> extends Accelatrix.Async.IChainablePromise<T> {
+        export interface IParallelQueryPromise<T> extends Accelatrix.Async.IChainablePromise<T> {
             /** Allows to subscribe to partial results. */
             OnPartialResult(onPartialResult: (result: T) => void): IParallelQueryPromise<T>;
         }
@@ -2404,6 +2422,6 @@ declare namespace Accelatrix {
         export const ParallelQuery: {
             new <T>(arg: Array<T> | Accelatrix.Collections.IEnumerableOps<T> | (() => IterableIterator<T>)): Accelatrix.Collections.IEnumerableAsyncOps<T>;
         };
-        
+        export {};
     }
 }
