@@ -28,7 +28,7 @@
     }
 /** Accelatrix namespace. */
 declare namespace Accelatrix {
-    const Version = "1.7.0";
+    const Version = "1.7.2";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -425,7 +425,7 @@ declare namespace Accelatrix {
     }
     /** Deals with localization. */
     module Globalization {
-        /** Represent the formatting parameters for a given locale- */
+        /** Represent the formatting parameters for a given locale. */
         interface ILocaleFormatInfo {
             /** Gets the short date pattern, e.g. dd/mm/yyyy */
             readonly ShortDatePattern: string;
