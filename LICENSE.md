@@ -1,12 +1,11 @@
 Accelatrix Dual-Purpose License
 
-Copyright (c) 2024 Miguel@Ferreira-family.org
+Copyright (c) 2024 - 2026 Miguel@Ferreira-family.org
 
 1. Definitions
    "Software" refers to Accelatrix and associated documentation files.
    "Copyright Holder" refers to Miguel@Ferreira-family.org.
    "You" refers to the licensee, or person using the Software.
-   "User Login Wall" refers to any mechanism that requires user authentication to access the Software's functionality.
    "Commercial Use" means any use of the Software intended for or directed toward commercial advantage or monetary compensation.
 
 2. Grant of Rights
@@ -15,10 +14,10 @@ Copyright (c) 2024 Miguel@Ferreira-family.org
 3. Permitted Uses
    a. Academic and Evaluation Use: You may use, copy, modify, and distribute the Software for academic purposes and evaluation without restriction.
    b. Non-Commercial Use: You may use, copy, and distribute the Software for non-commercial purposes.
-   c. Limited Commercial Use: You may use the Software for Commercial Use, provided that such use does not involve a publicably accessible User Login Wall. Intranet usage is therefore allowed. Please contact the copyright holder to obtain permission to use Accelatrix in a commercial setting involving publicaly accessible User Login Walls.
+   c. Limited Commercial Use: You may use the Software for Commercial Use, provided that such use does not involve a publicably accessible Paid User Login Wall. Intranet usage is therefore allowed and so is Internet usage as long as end-users are not being directly charged. Please contact the copyright holder to obtain permission to use Accelatrix in a commercial setting involving publicaly accessible Paid User Login Walls.
 
 4. Restrictions
-   a. User Login Wall: Any use of the Software that involves providing access to the Software's functionality behind a User Login Wall that is publicaly accessible requires a separate commercial license from the Copyright Holder.
+   a. Paid User Login Wall: Any use of the Software that involves providing access to the Software's functionality behind a User Login Wall that is publicaly accessible and directly charges end-users. Such scenario requires a separate commercial license from the Copyright Holder.
    b. Reverse Engineering: You may not reverse engineer, decompile, or disassemble the Software, except to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation.
    c. Extensions and Derivative Works: You may not create extensions or derivative works based on the Software without explicit written permission from the Copyright Holder.
    d. Licensees may NOT use third‐party agents such as commercial reproduction services in furtherance of their own permitted noncommercial uses.
@@ -48,6 +47,6 @@ Copyright (c) 2024 Miguel@Ferreira-family.org
     e. Any arrangements, understandings, or agreements regarding the Licensed Material not stated herein are separate from and independent of the terms and conditions of this Public License.
 
 11. Commercial Licensing
-    For commercial use involving a User Login Wall or for obtaining explicit permission for extensions or derivative works, please contact Miguel@Ferreira-family.org to obtain a separate commercial license.
+    For commercial use involving a Paid User Login Wall or for obtaining explicit permission for extensions or derivative works, please contact Miguel@Ferreira-family.org to obtain a separate license.
 
 BY USING THE SOFTWARE, YOU ACKNOWLEDGE THAT YOU HAVE READ THIS LICENSE, UNDERSTAND IT, AND AGREE TO BE BOUND BY ITS TERMS AND CONDITIONS.
