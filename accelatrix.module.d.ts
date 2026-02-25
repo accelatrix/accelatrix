@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.7.3";
+    const Version = "1.7.4";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1112,19 +1112,19 @@ export declare namespace Accelatrix {
              * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
              * @param typeConstructor The type constructor, e.g. the reference to the class definition.
              */
-            OfType<TFilter extends T>(typeConstructor: {
+            OfType<TFilter>(typeConstructor: {
                 new (...args: any[]): TFilter;
             }): IEnumerableOps<TFilter>;
             /**
              * Filters members based on their type.  Type inheritance is taken into account.
              * @param type The Accelatrix.Type of the type to filter.
              */
-            OfType<TFilter extends T>(type: Accelatrix.Type): IEnumerableOps<TFilter>;
+            OfType<TFilter>(type: Accelatrix.Type): IEnumerableOps<TFilter>;
             /**
              * Filters members based on their type.  Type inheritance is taken into account.
              * @param typeName The name or full name of the type.
              */
-            OfType<TFilter extends T>(typeName: string): IEnumerableOps<TFilter>;
+            OfType<TFilter>(typeName: string): IEnumerableOps<TFilter>;
             /** Gets if the sequence contains any elements. */
             Any(): boolean;
             /** Gets if the sequence doet not contain any elements. */
@@ -1360,7 +1360,7 @@ export declare namespace Accelatrix {
              * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
              * @param typeConstructorOrType The type constructor, e.g. the reference to the class, or the Accelatrix.Type of the type to filter.
              */
-            OfType<TFilter extends T>(typeConstructorOrType: {
+            OfType<TFilter>(typeConstructorOrType: {
                 new (...args: any[]): TFilter;
             } | Accelatrix.Type | string): IEnumerableOps<TFilter>;
             /** Wraps the enumeration. */
@@ -2251,19 +2251,19 @@ export declare namespace Accelatrix {
              * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
              * @param typeConstructor The type constructor, e.g. the reference to the class definition.
              */
-            OfType<TFilter extends T>(typeConstructor: {
+            OfType<TFilter>(typeConstructor: {
                 new (...args: any[]): TFilter;
             }): IEnumerableAsyncOps<TFilter>;
             /**
              * Filters members based on their type.  Type inheritance is taken into account.
              * @param type The Accelatrix.Type of the type to filter.
              */
-            OfType<TFilter extends T>(type: Accelatrix.Type): IEnumerableAsyncOps<TFilter>;
+            OfType<TFilter>(type: Accelatrix.Type): IEnumerableAsyncOps<TFilter>;
             /**
              * Filters members based on their type.  Type inheritance is taken into account.
              * @param typeName The name or full name of the type.
              */
-            OfType<TFilter extends T>(typeName: string): IEnumerableAsyncOps<TFilter>;
+            OfType<TFilter>(typeName: string): IEnumerableAsyncOps<TFilter>;
             /** Commits an enumeration as a typed list. */
             ToList(): Accelatrix.Async.IChainablePromise<Accelatrix.Collections.IEnumerableOps<T>>;
             /**
