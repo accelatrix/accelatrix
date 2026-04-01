@@ -28,7 +28,7 @@
     }
 /** Accelatrix namespace. */
 declare namespace Accelatrix {
-    const Version = "1.7.5";
+    const Version = "1.7.6";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -424,7 +424,7 @@ declare namespace Accelatrix {
         static set TimezoneLess(value: boolean);
     }
     /** Deals with localization. */
-    module Globalization {
+    namespace Globalization {
         /** Represent the formatting parameters for a given locale. */
         interface ILocaleFormatInfo {
             /** Gets the short date pattern, e.g. dd/mm/yyyy */
@@ -1655,7 +1655,7 @@ declare namespace Accelatrix {
 
 
 declare namespace Accelatrix {
-    module Async {
+    namespace Async {
         /** An ongoing promise-like request that can be cancelled, along with the error and result callback. */
         interface ICancellablePromise<T> extends PromiseLike<T> {
             /** Cancels an ongoing request by raising an AbortException. */
@@ -1739,7 +1739,7 @@ declare namespace Accelatrix {
         static get Config(): Tasks.ITasksConfig;
     }
     /** Parallel execution system using Web Workers. */
-    module Tasks {
+    namespace Tasks {
         /** The type of source of a script made available to the Tasks engine to be presented to its Web Workers. */
         export enum TaskScriptSource {
             /** URL of the script (must be hosted by the same site due to cross-domain constraints). */
