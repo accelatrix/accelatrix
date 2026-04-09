@@ -28,7 +28,7 @@
     }
 /** Accelatrix namespace. */
 declare namespace Accelatrix {
-    const Version = "1.7.6";
+    const Version = "1.7.7";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -174,7 +174,7 @@ declare namespace Accelatrix {
         * If a string is null or empty or is comprised of just white spaces.
         * @param text The string to probe.
         */
-        IsNullOrWhiteSpace(text: string): boolean;
+        IsNullOrWhiteSpace(text?: string | null | undefined): boolean;
     }
 
 
@@ -424,7 +424,7 @@ declare namespace Accelatrix {
         static set TimezoneLess(value: boolean);
     }
     /** Deals with localization. */
-    namespace Globalization {
+    module Globalization {
         /** Represent the formatting parameters for a given locale. */
         interface ILocaleFormatInfo {
             /** Gets the short date pattern, e.g. dd/mm/yyyy */
@@ -471,7 +471,7 @@ declare namespace Accelatrix {
          * @param formats A different set of formats to be used instead of Globalization.DefaultFormatting.
          * @returns Returns the date as a localized string.
          */
-        function FormatDate(date: Date, abbreviatedMonth: boolean, formats: ILocaleFormatInfo): string;
+        function FormatDate(date: Date, abbreviatedMonth: boolean, formats: ILocaleFormatInfo | undefined | null): string;
         /**
          * Formats a Date as a string containing the day and the name of the month according to the default ILocaleFormatInfo.
          * @param date The date to format.
@@ -484,7 +484,7 @@ declare namespace Accelatrix {
          * @param formats A different set of formats to be used instead of Globalization.DefaultFormatting.
          * @returns Returns the formatted date.
          */
-        function FormatDayMonth(date: Date, formats: ILocaleFormatInfo): string;
+        function FormatDayMonth(date: Date, formats: ILocaleFormatInfo | undefined | null): string;
         /**
          * Formats a Date as a string containing the name of the month and the year according to the default ILocaleFormatInfo.
          * @param date The date to format.
@@ -497,7 +497,7 @@ declare namespace Accelatrix {
          * @param formats A different set of formats to be used instead of Globalization.DefaultFormatting.
          * @returns Returns the formatted date.
          */
-        function FormatMonthYear(date: Date, formats: ILocaleFormatInfo): string;
+        function FormatMonthYear(date: Date, formats: ILocaleFormatInfo | undefined | null): string;
         /**
          * Formats a Date with time String according to the default ILocaleFormatInfo.
          * @param date The date for format.
@@ -509,7 +509,7 @@ declare namespace Accelatrix {
          * @param formats It a different set of formats should be used instead of Globalization.DefaultFormatting.
          * @returns Returns the date as a localized time string.
          */
-        function FormatDateTime(date: Date, formats: ILocaleFormatInfo): string;
+        function FormatDateTime(date: Date, formats: ILocaleFormatInfo | undefined | null): string;
         /**
          * Formats a Date as time String according to the default ILocaleFormatInfo.
          * @param date The date for format.
@@ -521,7 +521,7 @@ declare namespace Accelatrix {
          * @param formats It a different set of formats should be used instead of Globalization.DefaultFormatting.
          * @returns Returns the date as a localized time string.
          */
-        function FormatTime(date: Date, formats: ILocaleFormatInfo): string;
+        function FormatTime(date: Date, formats: ILocaleFormatInfo | undefined | null): string;
         /**
          * Parses a month year string back into a date according to the default ILocaleFormatInfo.
          * @param monthYear The month year to parse.
@@ -532,7 +532,7 @@ declare namespace Accelatrix {
          * @param monthYear The month year to parse.
          * @param formats A different set of formats to be used instead of Globalization.DefaultFormatting.
          */
-        function ParseMonthYear(monthYear: string, formats: ILocaleFormatInfo): Date;
+        function ParseMonthYear(monthYear: string, formats: ILocaleFormatInfo | undefined | null): Date;
         /**
          * Parses a date string back into a date according to the default ILocaleFormatInfo.
          * @param date The date string to parse.
@@ -543,7 +543,7 @@ declare namespace Accelatrix {
          * @param date The date string to parse.
          * @param formats A different set of formats to be used instead of Globalization.DefaultFormatting.
          */
-        function ParseDate(date: string, formats: ILocaleFormatInfo): Date;
+        function ParseDate(date: string, formats: ILocaleFormatInfo | undefined | null): Date;
         /**
          * Formats a boolean as string.
          * @param value The value to format.
@@ -575,7 +575,7 @@ declare namespace Accelatrix {
          * @param numberFormatSimplification If the number should be simplified, e.g. 1.1K, 2.2M.
          * @param formats A different set of formats to be used instead of Globalization.DefaultFormatting.
          */
-        function FormatNumber(number: number, precision: number, numberFormatSimplification: NumberFormatSimplification, formats: ILocaleFormatInfo): string;
+        function FormatNumber(number: number, precision: number, numberFormatSimplification: NumberFormatSimplification | undefined | null, formats: ILocaleFormatInfo | undefined | null): string;
         /**
          * Parses a number string back into a number according to the default ILocaleFormatInfo.
          * @param number The number to parse.
@@ -586,7 +586,7 @@ declare namespace Accelatrix {
          * @param number The number to parse.
          * @param formats A different set of formats to be used instead of Globalization.DefaultFormatting.
          */
-        function ParseNumber(number: string, formats: ILocaleFormatInfo): number;
+        function ParseNumber(number: string, formats: ILocaleFormatInfo | undefined | null): number;
         /** The number and date formats associated with a given locale. */
         class LocaleFormatInfo implements Globalization.ILocaleFormatInfo {
             /**
@@ -755,7 +755,7 @@ declare namespace Accelatrix {
          * @param unit The unit or its string representation.
          * @param precision The precision to use for display purposes, e.g. null, 0, 1, 10, 100, 1000, ....
          */
-        protected constructor(amount: number, unit: T | string, precision: number);
+        protected constructor(amount: number, unit: T | string, precision: number | undefined | null);
         /** Gets the full precision numeric amount.*/
         get Amount(): number;
         /** Gets the unit of the amount. */
@@ -770,7 +770,7 @@ declare namespace Accelatrix {
          * Adds a number or quantity to the current number and produces a new number instance.
          * @param operands  A single number, or a single quantity, or a collection of numbers, or a collection of quantities.
          */
-        Add(operands: number | IQuantity<T> | Array<number | IQuantity<T>>): IQuantity<T>;
+        Add(operands: number | IQuantity<IUnit> | Array<number | IQuantity<IUnit>>): IQuantity<IUnit>;
         /**
          * Indicates if a given object is an IQuantity or a number.
          * @param obj The object to test.
@@ -786,7 +786,7 @@ declare namespace Accelatrix {
          * @param quantity The quantity to format.
          * @param formatting A different set of formats to be used instead of Globalization.DefaultFormatting.
          */
-        static Format(quantity: IQuantity<IUnit>, formatting: Accelatrix.Globalization.ILocaleFormatInfo): string;
+        static Format(quantity: IQuantity<IUnit>, formatting: Accelatrix.Globalization.ILocaleFormatInfo | undefined): string;
         /**
          * Adds a collection of quantities.
          * @param operands A collection of numbers or quantities.
@@ -1148,9 +1148,9 @@ declare namespace Accelatrix {
             */
             Where(selector: (element: T, index?: number) => boolean): IEnumerableOps<T>;
             /** Gets the first element of a sequence, or null if empty. */
-            FirstOrNull(): T;
+            FirstOrNull(): T | null;
             /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
-            LastOrNull(): T;
+            LastOrNull(): T | null;
             /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
             Reverse(): Array<T>;
             /** Gets all entries which are not null, and in string enumerations, not empty or white spaces. */
@@ -1655,6 +1655,7 @@ declare namespace Accelatrix {
 
 
 declare namespace Accelatrix {
+    /** Deals with asynchronous operations. */
     namespace Async {
         /** An ongoing promise-like request that can be cancelled, along with the error and result callback. */
         interface ICancellablePromise<T> extends PromiseLike<T> {
@@ -2190,9 +2191,9 @@ declare namespace Accelatrix {
             /** If a given element does not exist within the enumeration. */
             NotContains(element: T | PromiseLike<T>): Accelatrix.Async.IChainablePromise<boolean>;
             /** Gets the first element of a sequence, or null if empty, but the order is random and not necessarily the order at input. */
-            FirstOrNull(): Accelatrix.Async.IChainablePromise<T>;
+            FirstOrNull(): Accelatrix.Async.IChainablePromise<T | null>;
             /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
-            LastOrNull(): Accelatrix.Async.IChainablePromise<T>;
+            LastOrNull(): Accelatrix.Async.IChainablePromise<T | null>;
             /**
             * Creates a HashMap from a sequence according to a specified key selector function. e.g. myPerson.ToDictionary(z => z.Id, w => w).
             * @param keySelector A function to extract the key from each element.
@@ -2365,13 +2366,7 @@ declare namespace Accelatrix {
 
 
 
-    interface Array<T> {
-        /**
-        * Creates a new enumeration that is handled in Web Workers.
-        * The Tasks.Config.Scripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
-        */
-        AsParallel: () => Accelatrix.Collections.IEnumerableAsyncOps<T>;
-    }
+
 declare namespace Accelatrix {
     /** Operations for enumerations. */
     interface IEnumerable<T> {
