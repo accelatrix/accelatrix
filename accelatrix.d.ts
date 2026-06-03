@@ -28,7 +28,7 @@
     }
 /** Accelatrix namespace. */
 declare namespace Accelatrix {
-    const Version = "1.7.7";
+    const Version = "1.7.8";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1634,13 +1634,21 @@ declare namespace Accelatrix {
         }>(alias: string): any;
         /**
          * A decorator to mark a property as serializable.
+         * Be warned: Newer versions of TypeScript compilers tend to remove propery setters when decorators are used. Set experimentalDecorators to true if you wish to overcome this.
          */
         function DataMember(): any;
         /**
          * A decorator to mark a property as serializable.
+         * Be warned: Newer versions of TypeScript compilers tend to remove property setters when decorators are used. Set experimentalDecorators to true if you wish to overcome this.
          * @param include If it should be included.
          */
         function DataMember(include: boolean): any;
+        /**
+         * A decorator to mark a property as serializable.
+         * Be warned: Newer versions of TypeScript compilers tend to remove property setters when decorators are used. Set experimentalDecorators to true if you wish to overcome this.
+         * @param name Serialize with a different name.
+         */
+        function DataMember(name: string): any;
         /** Decorator to tag the method to be invoked when serialization begins. */
         function OnSerializing(): (target: Object, propertyKey: string, descriptor: PropertyDescriptor) => void;
         /** Decorator to tag the method to be invoked when serialization ends. */
