@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.7.8";
+    const Version = "1.7.9";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -1070,6 +1070,7 @@ export {};
 
 
 
+
 declare global {
     /** Array as IEnumerable. */
     export interface Array<T> extends Accelatrix.Collections.IEnumerableOps<T> {
@@ -1356,6 +1357,11 @@ export declare namespace Accelatrix {
              * @param action The action to execute.
              */
             ForAll<TOut>(action: (element: T, index?: number) => TOut): Accelatrix.Async.IChainablePromise<TOut[]>;
+            /**
+            * Creates a new enumeration that is handled in Web Workers.
+            * The Tasks.Config.Scripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
+            */
+            AsParallel<T>(): Accelatrix.Collections.IEnumerableAsyncOps<T>;
             /**
              * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
              * @param typeConstructorOrType The type constructor, e.g. the reference to the class, or the Accelatrix.Type of the type to filter.
@@ -2392,16 +2398,6 @@ export declare namespace Accelatrix {
 
 
 export declare namespace Accelatrix {
-    /** Operations for enumerations. */
-    interface IEnumerable<T> {
-        /**
-        * Creates a new enumeration that is handled in Web Workers.
-        * The Tasks.Config.Scripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
-        */
-        AsParallel: () => Accelatrix.Collections.IEnumerableAsyncOps<T>;
-    }
-}
-export declare namespace Accelatrix {
     namespace Collections {
         interface IteratorResult<T> {
             done: boolean;
@@ -2413,6 +2409,22 @@ export declare namespace Accelatrix {
             throw?(e?: any): IteratorResult<T>;
         }
         interface IterableIterator<T> extends Iterator<T> {
+        }
+        /** Operations for enumerations. */
+        export interface IEnumerableOps<T> {
+            /**
+            * Creates a new enumeration that is handled in Web Workers.
+            * The Tasks.Config.Scripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
+            */
+            AsParallel: () => Accelatrix.Collections.IEnumerableAsyncOps<T>;
+        }
+        /** Operations for enumerations. */
+        export interface IEnumerableAsyncOps<T> {
+            /**
+            * Creates a new enumeration that is handled in Web Workers.
+            * The Tasks.Config.Scripts static property must have been set once in the session to present the baseline JS scripts/code segments to be used by tasks. Ensure that the scripts or code pertaining to Base.js, Object.js, Linq.js and Tasks.js are always included.
+            */
+            AsParallel: () => Accelatrix.Collections.IEnumerableAsyncOps<T>;
         }
         /** A cancellable promise issued by a ParallelQuery's GetAwaiter(). */
         export interface IParallelQueryPromise<T> extends Accelatrix.Async.IChainablePromise<T> {
