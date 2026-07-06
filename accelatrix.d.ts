@@ -28,7 +28,7 @@
     }
 /** Accelatrix namespace. */
 declare namespace Accelatrix {
-    const Version = "1.7.9";
+    const Version = "1.8.0";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
