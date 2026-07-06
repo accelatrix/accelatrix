@@ -1,0 +1,27 @@
+{
+    "compilerOptions":
+    {
+        "baseUrl": "",  
+        "target": "es5",
+        "module": "es6",
+        "moduleResolution": "classic",
+        "isolatedModules": false,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "declaration": true,
+        "declarationMap": false,
+        "sourceMap": false,
+        "noEmitOnError": false,
+        "noImplicitAny": false,
+        "noImplicitUseStrict": false,
+        "removeComments": false,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "skipLibCheck": true,
+        "pretty": true,
+        "typeRoots": ["node_modules/@types"],
+        "lib": ["es5", "es6", "dom"],
+    },
+    "exclude": ["node_modules", "typings/browser", "typings/browser.d.ts"],
+}
