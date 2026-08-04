@@ -2008,6 +2008,8 @@ export namespace Accelatrix
         {
             if (contents == null) return "";
             
+            const isProd = contents.indexOf('var Accelatr' + 'ix,__extends=') >= 0;
+
             let start = contents.indexOf('var Accelatr' + 'ix,__extends='); // prod
             if (start < 0)
                 start = contents.indexOf('var __ext' + 'ends = (this'); // dev;
@@ -2015,12 +2017,25 @@ export namespace Accelatrix
             if (start < 0)
                 return contents;
 
-            let endString = ';if("object"==typeof module&&"object"==typeof module.exports)module.exports=Accelatrix;Accelatrix.__esModule=Accelatrix;Accelatrix.Accelatrix=Accelatrix;if(self==null){self={}};self["Accelatrix"]=Accelatrix;';
-            let end = endString.length + contents.lastIndexOf(endString);
+            let endStringProd = ';if("object"==typeof module&&"object"==typeof module.exports)module.exports=Accelatrix;Accelatrix.__esModule=Accelatrix;Accelatrix.Accelatrix=Accelatrix;if(self==null){self={}};self["Accelatrix"]=Accelatrix;';
+            let endStringDev = '; if ("object" == typeof module && "object" == typeof module.exports) module.exports = Accelatrix; Accelatrix.__esModule = Accelatrix; Accelatrix.Accelatrix = Accelatrix; if (self == null) { self = {} }; self["Accelatrix"] = Accelatrix;';
+            
+            if (isProd)
+            {
+                let end = endStringProd.length + contents.lastIndexOf(endStringProd);
 
-            return end < endString.length
-                   ? contents
-                   : contents.substring(start, end);
+                return end < endStringProd.length
+                       ? contents
+                       : contents.substring(start, end);
+            }
+            else
+            {
+                let end = endStringDev.length + contents.lastIndexOf(endStringDev);
+
+                return end < endStringDev.length
+                       ? contents
+                       : contents.substring(start, end);
+            }
         }
 
         function GetData(url: string, cache: boolean, callback: (result: string, error: any) => void): void

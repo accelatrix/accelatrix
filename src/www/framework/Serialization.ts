@@ -61,17 +61,17 @@ export namespace Accelatrix
          * Decorator to mark a class in order to register its type during a deserialization process.
          * @param constructor The class constructor.
          */
-        export function KnownType<T extends { new (...args: any[]): {} }>(constructor: T)
+        export function KnownType<T extends { new (...args: any[]): {} }>(constructor: T, context?: any)
         /**
          * Decorator to mark a class in order to register its type during a deserialization process.
          * @param alias The alias of the type, which should include namespace information, e.g. Bio.Mamal.Dog.
          */ 
-        export function KnownType<T extends { new (...args: any[]): {} }>(alias: string)
+        export function KnownType<T extends { new (...args: any[]): {} }>(alias: string, context?: any)
         /**
          * Decorator to mark a class in order to register its type during a deserialization process.
          * @param constructorOrAlias The type's constructor or alias of the type, which should include namespace information, e.g. Bio.Mamal.Dog.
          */         
-        export function KnownType<T extends { new (...args: any[]): {} }>(constructorOrAlias?: T | string)
+        export function KnownType<T extends { new (...args: any[]): {} }>(constructorOrAlias?: T | string, context?: any)
         {   
             var isFunction = false;
 
@@ -185,7 +185,7 @@ export namespace Accelatrix
         export function DataMember(include?: boolean | string)
         {
             return function (target: any, propertyKey: string, descriptor: PropertyDescriptor)
-            {
+            {        
                 /*
                 var propName = propertyKey != null && propertyKey["name"] != null
                                ? propertyKey["name"]
@@ -200,7 +200,9 @@ export namespace Accelatrix
             };
         }
 
-        /** Decorator to tag the method to be invoked when serialization begins. */
+        /** Decorator to tag the method to be invoked when serialization begins. 
+         * This may require experimental decorators set to true.
+        */
         export function OnSerializing()
         {
             return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor)
@@ -209,7 +211,9 @@ export namespace Accelatrix
             };            
         }
 
-         /** Decorator to tag the method to be invoked when serialization ends. */
+         /** Decorator to tag the method to be invoked when serialization ends. 
+          * This may require experimental decorators set to true.
+         */
          export function OnSerialized()
          {
              return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor)
@@ -218,7 +222,9 @@ export namespace Accelatrix
              };            
          }
 
-        /** Decorator to tag the method to be invoked when deserialization begins. */
+        /** Decorator to tag the method to be invoked when deserialization begins. 
+         * This may require experimental decorators set to true.
+        */
         export function OnDeserializing()
         {
             return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor)
@@ -227,7 +233,9 @@ export namespace Accelatrix
             };            
         }
 
-         /** Decorator to tag the method to be invoked when deserialization ends. */
+         /** Decorator to tag the method to be invoked when deserialization ends. 
+          * This may require experimental decorators set to true.
+         */
          export function OnDeserialized()
          {
              return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor)

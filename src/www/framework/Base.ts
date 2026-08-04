@@ -157,7 +157,7 @@ export namespace Accelatrix
      * @param constructor The class constructor.
      * @returns Returns the modified class constructor.
      */
-    export function ImmutableObject<T extends { new (...args: any[]): {} }>(constructor: T): T
+    export function ImmutableObject<T extends { new (...args: any[]): {} }>(constructor: T, context?: any): T
     {
         var original = constructor;
 
