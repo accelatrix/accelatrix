@@ -511,7 +511,8 @@ Date.prototype.toJSON = function ()
 namespace Accelatrix
 {
 
-    const isoDateRegex = new RegExp(/(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d[0-5]\d|Z))/);
+    //const isoDateRegex = new RegExp(/(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d[0-5]\d|Z))/);
+    const isoDateRegex = /^(?:\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])T(?:[01]\d|2[0-3]):[0-5]\d(?:\:[0-5]\d(?:\.\d{1,7})?)?(?:Z|[+-](?:0\d|1\d|2[0-3]):[0-5]\d)?)$/;
 
     function StringToDate(textDate: string)
     {
@@ -539,7 +540,7 @@ namespace Accelatrix
         
             if (obj instanceof String || typeof obj == "string")
             {
-                return obj != null && (obj as string).length <= 29 && (obj as string).length >= 20 && (obj as string).indexOf(" ") < 0 && "123456789".indexOf((obj as string).substring(0, 1)) >= 0 && isoDateRegex.test(obj as string)
+                return obj != null && (obj as string).length <= 33 && (obj as string).length >= 20 && (obj as string).indexOf(" ") < 0 && "0123456789".indexOf((obj as string).substring(0, 1)) >= 0 && isoDateRegex.test(obj as string)
                        ? StringToDate((obj as string).toString())
                        : obj;
             }
@@ -554,6 +555,8 @@ namespace Accelatrix
                 return obj;
             else
                 Object.keys(obj)
+                      .concat(obj["__proto__"] == null ? [] : obj.GetType().GetProperties().map(z => z.Name))
+                      .filter(function (v, i, a) { return a.indexOf(v) === i; }) // distinct
                       .map(z => ({ Name: z, Value: obj[z]}))
                       .filter(z => z.Value != null)
                       .forEach(z =>
@@ -561,14 +564,14 @@ namespace Accelatrix
                             if (z.Value instanceof Array || z.Value.constructor === Array)
                             {
                                 (<Array<any>>z.Value).map((w, i) => ({ Index: i, Item: w }))
-                                                    .filter(w => w.Item != null)
-                                                    .forEach(w => (z.Value)[w.Index] = Object.UnboxDates(w.Item));
+                                                     .filter(w => w.Item != null)
+                                                     .forEach(w => (z.Value)[w.Index] = Object.UnboxDates(w.Item));
                             }
                             else if (typeof z.Value == 'object')
                                 Object.UnboxDates(z.Value);
                             else
                             {
-                                if (z.Value != null && z.Value.length <= 29 && z.Value.length >= 23 && z.Value.indexOf(" ") < 0 && isoDateRegex.test(z.Value))
+                                if (z.Value != null && z.Value.length <= 33 && z.Value.length >= 20 && z.Value.indexOf(" ") < 0 && isoDateRegex.test(z.Value))
                                     obj[z.Name] = StringToDate(z.Value.toString());
                             }
                       });

@@ -341,7 +341,7 @@ export namespace Accelatrix
                     }
                     else if (value != null && (value instanceof String || typeof value == "string"))
                     {
-                        if ((value as string).length <= 29 && (value as string).length >= 20 && (value as string).indexOf(" ") < 0 && "123456789".indexOf((value as string).substring(0, 1)) >= 0) // Date candidate
+                        if ((value as string).length <= 33 && (value as string).length >= 20 && (value as string).indexOf(" ") < 0 && "0123456789".indexOf((value as string).substring(0, 1)) >= 0) // Date candidate
                         {
                             var result = Object.UnboxDates(value as any);
                             if (result != null && result["getTime"] != null) // is a date
