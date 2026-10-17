@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.8.2";
+    const Version = "1.8.3";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -953,6 +953,12 @@ declare global {
          * @param date The date to diff against.
          */
         DiffMonths: (date: Date) => number;
+        /**
+         * Indicates if the object is equal (not the same as same instance) to a given object's instance.
+         * IMPORTANT: The default implementation will compare Dates on same day and not on same millisecond.
+         * @param obj The object to compare against.
+         */
+        Equals(obj: any): boolean;
     }
     /**
     * The date base type.
