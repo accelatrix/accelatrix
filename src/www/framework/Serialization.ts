@@ -365,7 +365,18 @@ export namespace Accelatrix
 
                             if (prefix === 'function')
                             {
-                                return eval('(' + ReplaceEarlyBindingWithLateBinding(value) + ')');
+                                try
+                                {
+                                    return eval('(' + ReplaceEarlyBindingWithLateBinding(value) + ')');
+                                }
+                                catch(ex)
+                                {
+                                    if (value.indexOf("(") < 0)
+                                       return value;
+                                    else
+                                       throw ex;
+                                }
+                                
                             }
                             if (prefix === '_PxEgEr_') // RegExp
                             {
@@ -373,7 +384,17 @@ export namespace Accelatrix
                             }
                             if (prefix === '_NuFrRa_') // arrow function
                             {
-                                return eval(ReplaceEarlyBindingWithLateBinding(value.slice(8)));
+                             try
+                                {
+                                    return eval(ReplaceEarlyBindingWithLateBinding(value.slice(8)));
+                                }
+                                catch(ex)
+                                {
+                                    if (value.indexOf("(") < 0)
+                                      return value;
+                                    else
+                                      throw ex;
+                                }                                                                
                             }
                 
                             return value;
