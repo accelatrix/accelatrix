@@ -37,8 +37,14 @@ export namespace Accelatrix
             /** Gets the first element of a sequence, or null if empty, but the order is random and not necessarily the order at input. */
             FirstOrNull(): Accelatrix_Async.Async.IChainablePromise<T | null>;
 
+            /** Gets the first element of a sequence, or throws an exception if empty, but the order is random and not necessarily the order at input. */
+            First(): Accelatrix_Async.Async.IChainablePromise<T>;            
+
             /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
             LastOrNull(): Accelatrix_Async.Async.IChainablePromise<T | null>;
+
+            /** Gets the last element of a sequence, which implies that the enumeration is finite, or throws an exception if empty. */
+            Last(): Accelatrix_Async.Async.IChainablePromise<T>;            
 
             /**
             * Creates a HashMap from a sequence according to a specified key selector function. e.g. myPerson.ToDictionary(z => z.Id, w => w).
@@ -90,6 +96,11 @@ export namespace Accelatrix
              */
             OfType<TFilter>(typeConstructor: { new (...args: any[]): TFilter }): IEnumerableAsyncOps<TFilter>;
             /**
+             * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
+             * @param typeConstructor The type abstract constructor, e.g. the reference to the class definition.
+             */            
+            OfType<TFilter>(typeConstructor: Function & { prototype: TFilter }): IEnumerableAsyncOps<TFilter>;
+            /**
              * Filters members based on their type.  Type inheritance is taken into account.
              * @param type The Accelatrix.Type of the type to filter.
              */
@@ -114,7 +125,7 @@ export namespace Accelatrix
             * Projects each element of a sequence into a new form.
             * @param selector The projection function.
             */
-            Select<TOut>(selector: (element: T, index?: number) => TOut | PromiseLike<T>): IEnumerableAsyncOps<TOut>;
+            Select<TOut>(selector: (element: T, index?: number) => TOut | PromiseLike<T>): IEnumerableAsyncOps<TOut>;                 
 
             /**
             * Projects each element of a sequence into an sequence and flattens the resulting sequence into one sequence, e.g. myCollection.SelectMany(z => z), or myCollection.SelectMany(z => z.Children).
@@ -124,9 +135,9 @@ export namespace Accelatrix
 
             /**
             * Filters a sequence of values based on a predicate.
-            * @param selector The selector function.
+            * @param selector The predicate function.
             */
-            Where(selector: (element: T, index?: number) => boolean | PromiseLike<boolean>): IEnumerableAsyncOps<T>;
+            Where(selector: (element: T, index?: number) => boolean | PromiseLike<boolean>): IEnumerableAsyncOps<T>;                 
 
             /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
             Reverse(): IEnumerableAsyncOps<Array<T>>;
@@ -305,6 +316,14 @@ export namespace Accelatrix
         namespace AsyncEnumerableSystem
         {
             const CONCURRENCY_LEVEL = 8; //8; // the number of simultaneous async operations.
+
+            class EmptySequenceException extends Accelatrix_Base.Exception
+            {
+                constructor()
+                {
+                    super("Sequence does not contain any elements.");
+                }
+            }
 
             /** An enumeration that runs in parallel. */
             @Accelatrix_Serialization.Serialization.KnownType("Accelatrix.Collections.AsyncEnumerable")
@@ -916,7 +935,7 @@ export namespace Accelatrix
                 }
 
                 @EnumerableSerialization.DataMember(true)
-                public OfType<TFilter>(typeConstructorOrType: { new (...args: any[]): TFilter } | Accelatrix_Type.Type | string)
+                public OfType<TFilter>(typeConstructorOrType: { new (...args: any[]): TFilter } | (Function & { prototype: TFilter }) | Accelatrix_Type.Type | string)
                 {
                     return this.Where(z => !IsPromise(z)
                                            ? z != null && z.GetType().IsOfType(typeConstructorOrType)
@@ -1117,10 +1136,34 @@ export namespace Accelatrix
                     return myPromise as any;
                 }
 
+                public First()
+                {
+                    return this.FirstOrNull()
+                               .ContinueWith(z =>
+                               {
+                                    if (z == null)
+                                        throw new EmptySequenceException();
+                                   return z;
+                               }, 
+                               true);
+                }
+
                 public LastOrNull()
                 {
                     return Accelatrix_Async.Async.Chain(this.ToList(), (r: Array<T>) => r == null ? null : r[r.length - 1]) as any;
                 }
+
+                public Last()
+                {
+                    return this.LastOrNull()
+                               .ContinueWith(z =>
+                               {
+                                    if (z == null)
+                                        throw new EmptySequenceException();
+                                   return z;
+                               }, 
+                               true);
+                }                
 
                 @EnumerableSerialization.DataMember()
                 public Reverse()

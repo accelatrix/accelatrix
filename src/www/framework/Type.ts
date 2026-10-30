@@ -299,7 +299,7 @@ export namespace Accelatrix
          * Indicates if the specified type is the same or a parent from the current type.
          * @param type The type to compare or its name.
          */        
-        public IsOfType<T extends { new (...args: any[]): {} }>(type: Type | T | string)
+        public IsOfType<T extends (({ new (...args: any[]): {} }) | (Function & { prototype: T }))>(type: Type | T | string)
         {
             if (type == null) return false;
             if (this == type) return true;
@@ -334,7 +334,7 @@ export namespace Accelatrix
          * Indicates if the specified type is the same or a descendant from the current type.
          * @param type The type to compare or its name.
          */
-        public IsAssignableFrom<T extends { new (...args: any[]): {} }>(type: Type | T | string)
+        public IsAssignableFrom<T extends (({ new (...args: any[]): {} }) | (Function & { prototype: T }))>(type: Type | T | string)
         {
             if (type == null) return false;
             if (this == type) return true;
@@ -424,10 +424,24 @@ export namespace Accelatrix
          * @returns Returns the corresponding Type.
          */        
         public static FromConstructor(constructor: { new (...args: any[]): any }, alias?: string): Type
+        /**
+         * Gets the Type of the supplied object's constructor.
+         * @param constructor The abstract constructor.
+         * @param alias The alias of the type, which should include namespace information, e.g. Bio.Mamal.Dog.
+         * @returns Returns the corresponding Type.
+         */            
+        public static FromConstructor(constructor: Function & { prototype: any }, alias?: string): Type
+        /**
+         * Gets the Type of the supplied object's constructor.
+         * @param constructor The abstract constructor.
+         * @param alias The alias of the type, which should include namespace information, e.g. Bio.Mamal.Dog.
+         * @returns Returns the corresponding Type.
+         */            
+        public static FromConstructor(constructor: (({ new (...args: any[]): any }) | Function & { prototype: any }), alias?: string): Type        
         {
             if (constructor == null) throw new Accelatrix.ArgumentNullException("constructor");
 
-            return TypeSystem.GetTypeForConstructor(constructor, undefined, alias);
+            return TypeSystem.GetTypeForConstructor(constructor as any, undefined, alias);
         }
 
         /**
@@ -844,7 +858,7 @@ export namespace Accelatrix
             DropResolvedType(typeRegistration.Type);
         }
 
-        export function GetTypeForConstructor<T extends { new (...args: any[]): {} }>(constructor: T, referenceInstance?: any, namespace?: string): Type
+        export function GetTypeForConstructor<T extends (({ new (...args: any[]): {} }) | (Function & { prototype: any }))>(constructor: T, referenceInstance?: any, namespace?: string): Type
         {
             if (loadedTypes.length == 0 && !loadingTypes)
                 ScanTypes(Accelatrix);

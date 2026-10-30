@@ -70,6 +70,11 @@ export namespace Accelatrix
              */
             OfType<TFilter>(typeConstructor: { new (...args: any[]): TFilter }): IEnumerableOps<TFilter>;
             /**
+             * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
+             * @param typeConstructor The type abstract constructor, e.g. the reference to the class definition.
+             */            
+            OfType<TFilter>(typeConstructor: Function & { prototype: TFilter }): IEnumerableOps<TFilter>;            
+            /**
              * Filters members based on their type.  Type inheritance is taken into account.
              * @param type The Accelatrix.Type of the type to filter.
              */
@@ -102,7 +107,7 @@ export namespace Accelatrix
              * Iterates through each element in the enumeration and executes an action. The loop can be halted if the action returns false.
              * @param action The action to execute. The cycle is halted if the action returns a boolean false.
              */
-            ForEach(action: (element: T, index?: number) => boolean | void | any): void;
+            ForEach(action: (element: T, index?: number) => boolean | void | any): void;            
 
             /**
             * Concatenates one sequence after the existing.
@@ -115,7 +120,7 @@ export namespace Accelatrix
             * Projects each element of a sequence into a new form.
             * @param selector The projection function.
             */
-            Select<TOut>(selector: (element: T, index?: number) => TOut): IEnumerableOps<TOut>;
+            Select<TOut>(selector: (element: T, index?: number) => TOut): IEnumerableOps<TOut>;                
 
             /**
             * Projects each element of a sequence into a sequence and flattens the resulting sequence into one sequence, e.g. myCollection.SelectMany(z => z), or myCollection.SelectMany(z => z.Children).
@@ -125,12 +130,18 @@ export namespace Accelatrix
 
             /**
             * Filters a sequence of values based on a predicate.
-            * @param selector The selector function.
+            * @param selector The predicate function.
             */
             Where(selector: (element: T, index?: number) => boolean): IEnumerableOps<T>;
 
+            /** Gets the first element of a sequence, or an exception is thrown if empty. */
+            First(): T;
+
             /** Gets the first element of a sequence, or null if empty. */
-            FirstOrNull(): T | null;
+            FirstOrNull(): T | null;            
+
+            /** Gets the last element of a sequence, which implies that the enumeration is finite, or throws an exception if empty. */
+            Last(): T;
 
             /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
             LastOrNull(): T | null;
@@ -307,6 +318,14 @@ export namespace Accelatrix
         {
 
         }    
+
+        class EmptySequenceException extends Accelatrix_Base.Exception
+        {
+             constructor()
+             {
+                super("Sequence does not contain any elements.");
+             }
+        }
 
         class Enumerator<T> implements IEnumerator<T>
         {
@@ -708,7 +727,7 @@ export namespace Accelatrix
              * @param typeConstructorOrType The type constructor, e.g. the reference to the class, or the Accelatrix.Type of the type to filter.
              */
             @EnumerableSerialization.DataMember(true)
-            public OfType<TFilter>(typeConstructorOrType: { new (...args: any[]): TFilter } | Accelatrix_Type.Type | string): IEnumerableOps<TFilter>
+            public OfType<TFilter>(typeConstructorOrType: { new (...args: any[]): TFilter } | (Function & { prototype: TFilter }) | Accelatrix_Type.Type | string): IEnumerableOps<TFilter>
             {
                 return this.Where(z => z != null && z.GetType().IsOfType(typeConstructorOrType))
                            .Select(z => z as any);
@@ -850,25 +869,49 @@ export namespace Accelatrix
             }
         
             /** Gets the first element of a sequence, or null if empty. */
-            public FirstOrNull(): T
+            public FirstOrNull(): T | null
             {
                 var myEnumerator = this.GetEnumerator();
 
                 myEnumerator.MoveNext();
         
                 return myEnumerator.Current === undefined
-                    ? null
-                    : myEnumerator.Current;
+                       ? null
+                       : myEnumerator.Current;
             }
         
+            /** Gets the first element of a sequence, or throws and exception if empty. */
+            public First(): T
+            {
+                var myEnumerator = this.GetEnumerator();
+
+                myEnumerator.MoveNext();
+        
+                if (myEnumerator.Current === undefined)
+                    throw new EmptySequenceException();
+
+                return myEnumerator.Current;
+            }
+
+            /** Gets the last element of a sequence, which implies that the enumeration is finite, or throws an exception if empty. */
+            public Last(): T
+            {
+                var list = this.ToList();
+        
+                if (list.length == 0)
+                    throw new EmptySequenceException();
+
+                return list[list.length - 1];
+            }
+
             /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
-            public LastOrNull(): T    
+            public LastOrNull(): T | null
             {
                 var list = this.ToList();
         
                 return list.length == 0
-                    ? null
-                    : list[list.length - 1];
+                       ? null
+                       : list[list.length - 1];
             }
         
             /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
@@ -1835,11 +1878,21 @@ Array.prototype.FirstOrNull = function (): any
         : this[0];
 }
 
+Array.prototype.First = function (): any
+{
+    return new Accelatrix.Collections.Enumerable(<Array<any>>this).First();
+}
+
 Array.prototype.LastOrNull = function (): any
 {
     return this == null || !this.Any()
-        ? null
-        : this[this.length - 1];
+           ? null
+           : this[this.length - 1];
+}
+
+Array.prototype.Last = function (): any
+{
+    return new Accelatrix.Collections.Enumerable(<Array<any>>this).Last();
 }
 
 Array.prototype.Reverse = function (): Array<any>
