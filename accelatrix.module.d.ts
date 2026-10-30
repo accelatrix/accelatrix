@@ -30,7 +30,7 @@ declare global {
 }
 /** Accelatrix namespace. */
 export declare namespace Accelatrix {
-    const Version = "1.8.3";
+    const Version = "1.8.4";
     /** A base exception. */
     class Exception extends Error {
         constructor(message: string);
@@ -293,16 +293,20 @@ export declare namespace Accelatrix {
          * Indicates if the specified type is the same or a parent from the current type.
          * @param type The type to compare or its name.
          */
-        IsOfType<T extends {
+        IsOfType<T extends (({
             new (...args: any[]): {};
-        }>(type: Type | T | string): boolean;
+        }) | (Function & {
+            prototype: T;
+        }))>(type: Type | T | string): boolean;
         /**
          * Indicates if the specified type is the same or a descendant from the current type.
          * @param type The type to compare or its name.
          */
-        IsAssignableFrom<T extends {
+        IsAssignableFrom<T extends (({
             new (...args: any[]): {};
-        }>(type: Type | T | string): boolean;
+        }) | (Function & {
+            prototype: T;
+        }))>(type: Type | T | string): boolean;
         /** Gets the string representation of the Type. */
         toString(): string;
         /**
@@ -328,6 +332,24 @@ export declare namespace Accelatrix {
         static FromConstructor(constructor: {
             new (...args: any[]): any;
         }, alias: string): Type;
+        /**
+         * Gets the Type of the supplied object's constructor.
+         * @param constructor The constructor.
+         * @param alias The alias of the type, which should include namespace information, e.g. Bio.Mamal.Dog.
+         * @returns Returns the corresponding Type.
+         */
+        static FromConstructor(constructor: {
+            new (...args: any[]): any;
+        }, alias?: string): Type;
+        /**
+         * Gets the Type of the supplied object's constructor.
+         * @param constructor The abstract constructor.
+         * @param alias The alias of the type, which should include namespace information, e.g. Bio.Mamal.Dog.
+         * @returns Returns the corresponding Type.
+         */
+        static FromConstructor(constructor: Function & {
+            prototype: any;
+        }, alias?: string): Type;
         /**
          * Gets all Types that match a specified name ordered by best match.
          * @param typeName The name of the type to retrieve.
@@ -1123,6 +1145,13 @@ export declare namespace Accelatrix {
                 new (...args: any[]): TFilter;
             }): IEnumerableOps<TFilter>;
             /**
+             * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
+             * @param typeConstructor The type abstract constructor, e.g. the reference to the class definition.
+             */
+            OfType<TFilter>(typeConstructor: Function & {
+                prototype: TFilter;
+            }): IEnumerableOps<TFilter>;
+            /**
              * Filters members based on their type.  Type inheritance is taken into account.
              * @param type The Accelatrix.Type of the type to filter.
              */
@@ -1167,11 +1196,15 @@ export declare namespace Accelatrix {
             SelectMany<TOut>(selector: (element: T, index?: number) => IEnumerableOps<TOut>): IEnumerableOps<TOut>;
             /**
             * Filters a sequence of values based on a predicate.
-            * @param selector The selector function.
+            * @param selector The predicate function.
             */
             Where(selector: (element: T, index?: number) => boolean): IEnumerableOps<T>;
+            /** Gets the first element of a sequence, or an exception is thrown if empty. */
+            First(): T;
             /** Gets the first element of a sequence, or null if empty. */
             FirstOrNull(): T | null;
+            /** Gets the last element of a sequence, which implies that the enumeration is finite, or throws an exception if empty. */
+            Last(): T;
             /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
             LastOrNull(): T | null;
             /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
@@ -1374,7 +1407,9 @@ export declare namespace Accelatrix {
              */
             OfType<TFilter>(typeConstructorOrType: {
                 new (...args: any[]): TFilter;
-            } | Accelatrix.Type | string): IEnumerableOps<TFilter>;
+            } | (Function & {
+                prototype: TFilter;
+            }) | Accelatrix.Type | string): IEnumerableOps<TFilter>;
             /** Wraps the enumeration. */
             ToEnumerable<T>(): IEnumerableOps<T>;
             /**
@@ -1401,9 +1436,13 @@ export declare namespace Accelatrix {
              */
             Where(selector: (element: T, index?: number) => boolean): IEnumerableOps<T>;
             /** Gets the first element of a sequence, or null if empty. */
-            FirstOrNull(): T;
+            FirstOrNull(): T | null;
+            /** Gets the first element of a sequence, or throws and exception if empty. */
+            First(): T;
+            /** Gets the last element of a sequence, which implies that the enumeration is finite, or throws an exception if empty. */
+            Last(): T;
             /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
-            LastOrNull(): T;
+            LastOrNull(): T | null;
             /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
             Reverse(): Array<T>;
             /** Gets all entries which are not null, and in string enumerations, not empty. */
@@ -2236,8 +2275,12 @@ export declare namespace Accelatrix {
             NotContains(element: T | PromiseLike<T>): Accelatrix.Async.IChainablePromise<boolean>;
             /** Gets the first element of a sequence, or null if empty, but the order is random and not necessarily the order at input. */
             FirstOrNull(): Accelatrix.Async.IChainablePromise<T | null>;
+            /** Gets the first element of a sequence, or throws an exception if empty, but the order is random and not necessarily the order at input. */
+            First(): Accelatrix.Async.IChainablePromise<T>;
             /** Gets the last element of a sequence, which implies that the enumeration is finite, or null if empty. */
             LastOrNull(): Accelatrix.Async.IChainablePromise<T | null>;
+            /** Gets the last element of a sequence, which implies that the enumeration is finite, or throws an exception if empty. */
+            Last(): Accelatrix.Async.IChainablePromise<T>;
             /**
             * Creates a HashMap from a sequence according to a specified key selector function. e.g. myPerson.ToDictionary(z => z.Id, w => w).
             * @param keySelector A function to extract the key from each element.
@@ -2284,6 +2327,13 @@ export declare namespace Accelatrix {
                 new (...args: any[]): TFilter;
             }): IEnumerableAsyncOps<TFilter>;
             /**
+             * Filters members based on their type and provides a typed result. Type inheritance is taken into account.
+             * @param typeConstructor The type abstract constructor, e.g. the reference to the class definition.
+             */
+            OfType<TFilter>(typeConstructor: Function & {
+                prototype: TFilter;
+            }): IEnumerableAsyncOps<TFilter>;
+            /**
              * Filters members based on their type.  Type inheritance is taken into account.
              * @param type The Accelatrix.Type of the type to filter.
              */
@@ -2313,7 +2363,7 @@ export declare namespace Accelatrix {
             SelectMany<TOut>(selector: (element: T, index?: number) => Accelatrix.Collections.IEnumerableOps<TOut>): IEnumerableAsyncOps<TOut>;
             /**
             * Filters a sequence of values based on a predicate.
-            * @param selector The selector function.
+            * @param selector The predicate function.
             */
             Where(selector: (element: T, index?: number) => boolean | PromiseLike<boolean>): IEnumerableAsyncOps<T>;
             /** Produces a new enumeration in reverse order, which implies that the enumeration is finite. */
